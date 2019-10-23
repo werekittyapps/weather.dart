@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:weather/widgets/texts.dart';
 
 class WeatherBody extends StatefulWidget {
+
 @override
 createState() => new WeatherBodyState();
 }
@@ -53,136 +55,127 @@ class WeatherBodyState extends State<WeatherBody> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
-      appBar: AppBar(
-        title: _appBarTitle,
-        actions: <Widget>[
-          IconButton(
-            icon: _searchIcon,
-            onPressed: () {
-              print("pressed");
-              searching();
-              },
-          ),],
-      ),
-      body: Container(
-          child: searchFlag ?
-          // If we searching
-          Column (
-          children: [
-            Expanded (
-              child: Container (
-                child:
-                ListView.builder(
-                    itemCount: 2,//_filteredArray.length,
-                    itemBuilder: (context, i){
-                      return new ListTile(
-                        title: Container (
-                          // Белая карточка
-                            //padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                            color: Colors.white,
-                            child: Row (
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    children:[
-                                      // Верхняя часть: Город, страна, иконка и градусы
-                                      // Нижняя часть: дополнительные фичи
-                                      Container(
-                                        padding: EdgeInsets.fromLTRB(20, 20, 10, 20),
-                                        child: Row(
+        backgroundColor: Colors.grey[300],
+        //appBar:
+        body: Stack(
+          children: <Widget>[
+            Container(
+                padding: EdgeInsets.fromLTRB(0, 60, 0, 0),
+                child: searchFlag ?
+                // If we searching
+                Column (
+                    children: [
+                      Expanded (
+                        child: Container (
+                          padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                          child:
+                          ListView.builder(
+                              itemCount: 2,//_filteredArray.length,
+                              itemBuilder: (context, i){
+                                return new ListTile(
+                                  title: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: Colors.grey[400]
+                                      ),
+                                    ),
+                                    child: Container (
+                                      // Белая карточка
+                                      //padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                        color: Colors.white,
+                                        child: Row (
                                           children: [
-                                            // Город и страна
-                                            // Иконка
-                                            // Градусы
-                                            Container(
-                                              alignment: Alignment(-1.0, -1.0),
+                                            Expanded(
                                               child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    RichText(
-                                                    text: TextSpan(
-                                                        style: DefaultTextStyle.of(context).style,
-                                                        children: [
-                                                          TextSpan(
-                                                          text: 'Название города',
-                                                          style: TextStyle(
-                                                            fontSize: 22
-                                                          )
-                                                        )
-                                                      ]
+                                                children:[
+                                                  // Верхняя часть: Город, страна, иконка и градусы
+                                                  // Нижняя часть: дополнительные фичи
+                                                  Container(
+                                                    padding: EdgeInsets.fromLTRB(20, 20, 10, 20),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                      children: [
+                                                        // Город и страна
+                                                        // Иконка
+                                                        // Градусы
+                                                        Container(
+                                                          alignment: Alignment(-1.0, -1.0),
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              greyTextView(context, 'Название города', 22),
+                                                              greyTextView(context, 'Cтранa', 14),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                                          children: <Widget>[
+                                                            Row(
+                                                              children: <Widget>[
+                                                                Container(
+                                                                  alignment: Alignment(1.0, -1.0),
+                                                                  padding: EdgeInsets.fromLTRB(20, 5, 5, 5),
+                                                                  child: Icon(Icons.cloud),
+                                                                ),
+                                                                Container(
+                                                                  alignment: Alignment(1.0, -1.0),
+                                                                  padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                                                  child: greyTextView(context, 'N°C', 24),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
-                                                  RichText(
-                                                    text: TextSpan(
-                                                        style: DefaultTextStyle.of(context).style,
-                                                        children: [
-                                                          TextSpan(
-                                                              text: 'Название страны',
-                                                              style: TextStyle(
-                                                                  fontSize: 14
-                                                              )
-                                                          )
-                                                        ]
+                                                  Container(
+                                                    padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                                    child: Divider(
+                                                      thickness: 1,
                                                     ),
-                                                  )
+                                                  ),
+                                                  Container(
+                                                    padding: EdgeInsets.fromLTRB(5, 0, 5, 10),
+                                                    child: greyTextView(context, 'дополнительные функции', 14),
+                                                  ),
                                                 ],
                                               ),
-                                            ),
-                                            Container(
-                                              alignment: Alignment(1.0, -1.0),
-                                              child: Icon(Icons.cloud),
-                                            ),
-                                            Container(
-                                              alignment: Alignment(1.0, -1.0),
-                                              child: Text("tC"),
-                                            ),
+                                            )
                                           ],
-                                        ),
-                                      ),
-
-                                      Text("дополнительные функции"),
-                                    ],
+                                        )
+                                    ),
                                   ),
-                                )
-                              ],
-                            )
-                            //Row(
-                            //    children:[
-                            //      Expanded(
-                            //          child: Container(
-                            //              child: Column (
-                            //                crossAxisAlignment: CrossAxisAlignment.start,
-                            //                children: [
-                            //                  Container (
-                            //                    padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
-                            //                    child: RichText(
-                            //                      text: TextSpan(
-                            //                        style: DefaultTextStyle.of(context).style,
-                            //                        children: <TextSpan>[
-                            //                          TextSpan(text: 'Title: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                            //                          TextSpan(text: "${_filteredArray[i]["title"]}"),
-                            //                        ],
-                            //                      ),
-                            //                    ),
-                            //                  ),
-                            //                ],
-                            //              )
-                            //          )
-                            //      ),
-                            //    ]
-                            //)
+                                );
+                              }),
                         ),
-                      );
-                    }),
-              ),
+                      ),
+                    ]) :
+                // If we not searching, we must show favorite cards
+                Container()
             ),
-          ]) :
-          // If we not searching, we must show favorite cards
-          Container()
-      )
+            new Positioned(
+              top: 0.0,
+              left: 0.0,
+              right: 0.0,
+              child: AppBar(
+                title: _appBarTitle,
+                backgroundColor: Colors.transparent,
+                elevation: 0.0,
+                actions: <Widget>[
+                  IconButton(
+                    icon: _searchIcon,
+                    color: Colors.grey[800],
+                    onPressed: () {
+                      print("pressed");
+                      searching();
+                      },
+                  ),],
+              ),
+            )
+          ],
+        )
     );
   }
-
-
 }
