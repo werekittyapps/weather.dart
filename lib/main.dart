@@ -6,12 +6,23 @@ void main() {
       new MaterialApp(
           debugShowCheckedModeBanner: false,// скрываем надпись debug
           theme: ThemeData(
-          primarySwatch: Colors.grey,
-            textTheme: TextTheme(
-              headline: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold, color: Colors.grey[800]),
-              title: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic, color: Colors.grey[800]),
-              body1: TextStyle(fontSize: 14.0, fontFamily: 'Hind', color: Colors.grey[800]),
-            ),
+            primarySwatch: Colors.grey,
+            //primarySwatch: Colors.grey,
+            //brightness: Brightness.dark,
+            //primaryColorLight: Colors.grey[800],
+            //cardColor: Colors.grey[800],
+            //primaryColorDark: Colors.grey[800],
+            secondaryHeaderColor: Colors.grey[800],
+            //textSelectionColor: Colors.grey[800],
+            //cursorColor: Colors.grey[800],
+            //textSelectionHandleColor: Colors.grey[800],
+            //backgroundColor: Colors.grey[800],
+            //dialogBackgroundColor:Colors.grey[800],
+            indicatorColor: Colors.grey[800],
+            hintColor: Colors.grey[800],
+            //errorColor: Colors.grey[800],
+            //primaryColor: Colors.grey[800],
+            accentColor: Colors.grey[800],
       ),
           home: WeatherBody()
       )
