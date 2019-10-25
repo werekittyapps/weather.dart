@@ -68,7 +68,8 @@ currentWeatherSearchCard(BuildContext context, Map<String, dynamic> map) {
                     Container(
                       padding: EdgeInsets.fromLTRB(20, 20, 10, 20),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        //mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           // Город и страна
                           // Иконка
@@ -92,13 +93,11 @@ currentWeatherSearchCard(BuildContext context, Map<String, dynamic> map) {
                                     alignment: Alignment(1.0, -1.0),
                                     padding: EdgeInsets.fromLTRB(20, 5, 5, 5),
                                     child: cachedImageLoader(map["weather"][0]["icon"]),
-                                    //child: cachedImageLoader("sobaka"),
                                   ),
                                   Container(
                                     alignment: Alignment(1.0, -1.0),
                                     padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
                                     child: greyTextView(context, '${map["main"]["temp"].round()}°C', 24),
-                                    //child: greyTextView(context, "sobaka", 24),
                                   ),
                                 ],
                               ),
@@ -114,8 +113,22 @@ currentWeatherSearchCard(BuildContext context, Map<String, dynamic> map) {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(5, 0, 5, 10),
-                      child: clickableGreyTextView(context, 'дополнительные функции', 14),
+                        padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            clickableGreyTextView(context, 'Влажность ${map["main"]["humidity"].round()}% | '
+                                '${map["wind"]["deg"] > 337.5 || map["wind"]["deg"] < 22.5 ? "С"
+                                : map["wind"]["deg"] > 22.5 && map["wind"]["deg"] < 67.5 ? "СВ"
+                                : map["wind"]["deg"] > 67.5 && map["wind"]["deg"] < 112.5 ? "В"
+                                : map["wind"]["deg"] > 112.5 && map["wind"]["deg"] < 157.5 ? "ЮВ"
+                                : map["wind"]["deg"] > 157.5 && map["wind"]["deg"] < 202.5 ? "Ю"
+                                : map["wind"]["deg"] > 202.5 && map["wind"]["deg"] < 247.5 ? "ЮЗ"
+                                : map["wind"]["deg"] > 247.5 && map["wind"]["deg"] < 292.5 ? "З"
+                                : "СЗ"} | ${map["wind"]["speed"].round() * 3.6} км/ч', 14),
+                            clickableGreyTextView(context, '${map["main"]["temp_max"].round()}/${map["main"]["temp_min"].round()}°C', 14),
+                          ],
+                        )
                     ),
                   ],
                 ),
@@ -143,7 +156,7 @@ currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i
                       Container(
                         padding: EdgeInsets.fromLTRB(20, 20, 10, 20),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             // Город и страна
                             // Иконка
@@ -187,8 +200,22 @@ currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.fromLTRB(5, 0, 5, 10),
-                        child: clickableGreyTextView(context, 'дополнительные функции', 14),
+                          padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              clickableGreyTextView(context, 'Влажность ${map["list"][i]["main"]["humidity"].round()}% | '
+                                  '${map["list"][i]["wind"]["deg"] > 337.5 || map["list"][i]["wind"]["deg"] < 22.5 ? "С"
+                                  : map["list"][i]["wind"]["deg"] > 22.5 && map["list"][i]["wind"]["deg"] < 67.5 ? "СВ"
+                                  : map["list"][i]["wind"]["deg"] > 67.5 && map["list"][i]["wind"]["deg"] < 112.5 ? "В"
+                                  : map["list"][i]["wind"]["deg"] > 112.5 && map["list"][i]["wind"]["deg"] < 157.5 ? "ЮВ"
+                                  : map["list"][i]["wind"]["deg"] > 157.5 && map["list"][i]["wind"]["deg"] < 202.5 ? "Ю"
+                                  : map["list"][i]["wind"]["deg"] > 202.5 && map["list"][i]["wind"]["deg"] < 247.5 ? "ЮЗ"
+                                  : map["list"][i]["wind"]["deg"] > 247.5 && map["list"][i]["wind"]["deg"] < 292.5 ? "З"
+                                  : "СЗ"} | ${map["list"][i]["wind"]["speed"].round() * 3.6} км/ч', 14),
+                              clickableGreyTextView(context, '${map["list"][i]["main"]["temp_max"].round()}/${map["list"][i]["main"]["temp_min"].round()}°C', 14),
+                            ],
+                          )
                       ),
                     ],
                   ),
@@ -215,16 +242,12 @@ currentWeatherSearchCardWithBtn(BuildContext context, Map<String, dynamic> map, 
                       alignment: Alignment(-1.0, -1.0),
                       child: IconButton(
                         icon: Icon(isInFavorites ? Icons.star : Icons.star_border),
-                        //onPressed: () => isInFavorites ? delete : add,),
-                        onPressed: (){
-                          pressButton();
-                       //   pressButton();
-                        },),
+                        onPressed: (){pressButton();},),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(20, 0, 10, 20),
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           // Город и страна
                           // Иконка
@@ -268,8 +291,22 @@ currentWeatherSearchCardWithBtn(BuildContext context, Map<String, dynamic> map, 
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(5, 0, 5, 10),
-                      child: clickableGreyTextView(context, 'дополнительные функции', 14),
+                        padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            clickableGreyTextView(context, 'Влажность ${map["main"]["humidity"].round()}% | '
+                                '${map["wind"]["deg"] > 337.5 || map["wind"]["deg"] < 22.5 ? "С"
+                                : map["wind"]["deg"] > 22.5 && map["wind"]["deg"] < 67.5 ? "СВ"
+                                : map["wind"]["deg"] > 67.5 && map["wind"]["deg"] < 112.5 ? "В"
+                                : map["wind"]["deg"] > 112.5 && map["wind"]["deg"] < 157.5 ? "ЮВ"
+                                : map["wind"]["deg"] > 157.5 && map["wind"]["deg"] < 202.5 ? "Ю"
+                                : map["wind"]["deg"] > 202.5 && map["wind"]["deg"] < 247.5 ? "ЮЗ"
+                                : map["wind"]["deg"] > 247.5 && map["wind"]["deg"] < 292.5 ? "З"
+                                : "СЗ"} | ${map["wind"]["speed"].round() * 3.6} км/ч', 14),
+                            clickableGreyTextView(context, '${map["main"]["temp_max"].round()}/${map["main"]["temp_min"].round()}°C', 14),
+                          ],
+                        )
                     ),
                   ],
                 ),
