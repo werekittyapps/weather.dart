@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:weather/widgets/images.dart';
-import 'package:weather/widgets/texts.dart';
+import 'package:weather/widgets/cards.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class WeatherBody extends StatefulWidget {
@@ -12,7 +11,7 @@ createState() => new WeatherBodyState();
 
 class WeatherBodyState extends State<WeatherBody> {
   var _currentWeather;
-  var _currentWeatherForFavorits;
+  var _currentWeatherForFavorites;
   List<String> favCities = [];
   String citiesID = "";
 
@@ -22,14 +21,19 @@ class WeatherBodyState extends State<WeatherBody> {
   final TextEditingController _filter = new TextEditingController();
 
   // Flags
+  bool noFavorites = true;
   bool searchFlag = false;
   bool isLoading = false;
   bool curWeatherCallError = false;
-  bool curWeatherCallErrorForFavorits = false;
+  bool curWeatherCallErrorForFavorites = false;
   String curWeatherCallErrorMessage = "";
-  String curWeatherCallErrorMessageForFavorits = "";
+  String curWeatherCallErrorMessageForFavorites = "";
 
   currentWeather(String city) async {
+    print("current wheater");
+    setState(() {
+      isLoading = true;
+    });
     try {
       Response response = await Dio().get("https://api.openweathermap.org/data/2.5/weather?q=$city&appid=7fe8b89a7579b408a6997d47eb97164c&units=metric");
       debugPrint("current weather response ${response.statusCode}");
@@ -38,6 +42,7 @@ class WeatherBodyState extends State<WeatherBody> {
         setState(() {
           curWeatherCallError = false;
           searchFlag = true;
+          isLoading = false;
         });
       }
       if(response.statusCode == 400) {
@@ -45,6 +50,7 @@ class WeatherBodyState extends State<WeatherBody> {
           curWeatherCallError = true;
           curWeatherCallErrorMessage = "Некорректный запрос";
           searchFlag = true;
+          isLoading = false;
         });
       }
       if(response.statusCode == 404) {
@@ -52,6 +58,7 @@ class WeatherBodyState extends State<WeatherBody> {
           curWeatherCallError = true;
           curWeatherCallErrorMessage = "Такого города не найдено";
           searchFlag = true;
+          isLoading = false;
         });
       }
       if(response.statusCode == 429) {
@@ -59,6 +66,7 @@ class WeatherBodyState extends State<WeatherBody> {
           curWeatherCallError = true;
           curWeatherCallErrorMessage = "Исчерпан лимит запросов";
           searchFlag = true;
+          isLoading = false;
         });
       }
       if(response.statusCode == 500) {
@@ -66,6 +74,7 @@ class WeatherBodyState extends State<WeatherBody> {
           curWeatherCallError = true;
           curWeatherCallErrorMessage = "Internal Server Error: ошибка соединения с сервером";
           searchFlag = true;
+          isLoading = false;
         });
       }
       if(response.statusCode == 503) {
@@ -73,6 +82,7 @@ class WeatherBodyState extends State<WeatherBody> {
           curWeatherCallError = true;
           curWeatherCallErrorMessage = "Сервер недоступен";
           searchFlag = true;
+          isLoading = false;
         });
       }
     } catch (e) {
@@ -80,91 +90,93 @@ class WeatherBodyState extends State<WeatherBody> {
         curWeatherCallError = true;
         curWeatherCallErrorMessage = "Ошибка запроса: проверьте подключение";
         searchFlag = true;
+        isLoading = false;
       });
     }
   }
 
-  currentWeatherForFavorits(String listOfID) async {
-    //String listOfID = "";
-    //for(int i = 0; i < favCities.length; i++){
-    //  if (i != favCities.length){
-    //    listOfID += "${favCities[i]},";
-    //  } else {
-    //    listOfID += "${favCities[i]}";
-    //  }
-    //}
+  currentWeatherForFavorites(String listOfID) async {
+    print("current wheater for favorites");
     setState(() {
       isLoading = true;
     });
     try {
       Response response = await Dio().get("https://api.openweathermap.org/data/2.5/group?id=$listOfID&units=metric&appid=7fe8b89a7579b408a6997d47eb97164c");
-      debugPrint("favorits weather response ${response.statusCode}");
+      debugPrint("favorites weather response ${response.statusCode}");
       if(response.statusCode == 200) {
         setState(() {
-          _currentWeatherForFavorits = response.data;
-          curWeatherCallErrorForFavorits = false;
+          _currentWeatherForFavorites = response.data;
+          curWeatherCallErrorForFavorites = false;
           isLoading = false;
         });
       }
       if(response.statusCode == 400) {
         setState(() {
-          curWeatherCallErrorForFavorits = true;
-          curWeatherCallErrorMessageForFavorits = "Некорректный запрос";
+          curWeatherCallErrorForFavorites = true;
+          curWeatherCallErrorMessageForFavorites = "Некорректный запрос";
           isLoading = false;
         });
       }
       if(response.statusCode == 404) {
         setState(() {
-          curWeatherCallErrorForFavorits = true;
-          curWeatherCallErrorMessageForFavorits = "Такого города не найдено";
+          curWeatherCallErrorForFavorites = true;
+          curWeatherCallErrorMessageForFavorites = "Такого города не найдено";
           isLoading = false;
         });
       }
       if(response.statusCode == 429) {
         setState(() {
-          curWeatherCallErrorForFavorits = true;
-          curWeatherCallErrorMessageForFavorits = "Исчерпан лимит запросов";
+          curWeatherCallErrorForFavorites = true;
+          curWeatherCallErrorMessageForFavorites = "Исчерпан лимит запросов";
           isLoading = false;
         });
       }
       if(response.statusCode == 500) {
         setState(() {
-          curWeatherCallErrorForFavorits = true;
-          curWeatherCallErrorMessageForFavorits = "Internal Server Error: ошибка соединения с сервером";
+          curWeatherCallErrorForFavorites = true;
+          curWeatherCallErrorMessageForFavorites = "Internal Server Error: ошибка соединения с сервером";
           isLoading = false;
         });
       }
       if(response.statusCode == 503) {
         setState(() {
-          curWeatherCallErrorForFavorits = true;
-          curWeatherCallErrorMessageForFavorits = "Сервер недоступен";
+          curWeatherCallErrorForFavorites = true;
+          curWeatherCallErrorMessageForFavorites = "Сервер недоступен";
           isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
-        curWeatherCallErrorForFavorits = true;
-        curWeatherCallErrorMessageForFavorits = "Ошибка запроса: проверьте подключение";
+        curWeatherCallErrorForFavorites = true;
+        curWeatherCallErrorMessageForFavorites = "Ошибка запроса: проверьте подключение";
         isLoading = false;
       });
     }
   }
 
   getCached() async{
+    print("get cached");
     var noData = false;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var favorsID = (prefs.getString('favorits') ?? {
+    var favorsID = (prefs.getString('favorites') ?? {
       print("No favorites"),
-      noData = true
+      noFavorites = true,
+      noData = true,
     });
     if(!noData){
+      noFavorites = false;
       citiesID = favorsID;
       print(citiesID);
-      currentWeatherForFavorits(citiesID);
+      currentWeatherForFavorites(citiesID);
     }
+    print(noData);
+    setState(() {
+      noFavorites = noFavorites;
+    });
   }
 
   searching(){
+    print("searching");
     setState(() {
       if (this._searchIcon.icon == Icons.add) {
         this._searchIcon = new Icon(Icons.close);
@@ -188,26 +200,51 @@ class WeatherBodyState extends State<WeatherBody> {
     });
   }
 
-  addToFavorits(String id) async {
+  deleteFromFavorites(String id) async {
+    print("delete from favorites");
+    SharedPreferences getDataPrefs = await SharedPreferences.getInstance();
+    if (citiesID.contains("$id,")) {
+      citiesID = citiesID.replaceAll("$id,", "");
+      getDataPrefs.setString('favorites', citiesID);
+    } else {
+      citiesID = null;
+      getDataPrefs.setString('favorites', citiesID);
+    }
+  }
+  
+  isInFavorites(String id){
+    print("is in favorites");
+    if (citiesID != null && citiesID.contains("$id")) return true;
+    return false;
+  }
+
+  pressButton() {
+    print("press button");
+    setState(() {
+      if(isInFavorites(_currentWeather["id"].toString())) deleteFromFavorites(_currentWeather["id"].toString());
+      else addToFavorites(_currentWeather["id"].toString());
+      isInFavorites(_currentWeather["id"].toString());
+    });
+  }
+
+  addToFavorites(String id) async {
+    print("add to favorites");
     SharedPreferences getDataPrefs = await SharedPreferences.getInstance();
     print(id);
-    if (citiesID != ""){
+    if (citiesID != null){
       citiesID += ",$id";
-      getDataPrefs.setString('favorits', citiesID);
+      getDataPrefs.setString('favorites', citiesID);
     } else {
       citiesID = "$id";
-      getDataPrefs.setString('favorits', citiesID);
+      getDataPrefs.setString('favorites', citiesID);
     }
-    //favCities.add(id);
-    //getDataPrefs.setStringList('favorits', favCities);
-
   }
 
-  deleteCache() async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.clear();
-    print('deleted');
-  }
+  //delete Cache() async{
+  //  print("delete cache");
+  //  SharedPreferences prefs = await SharedPreferences.getInstance();
+  //  prefs.clear();
+  //}
 
   @override
   void initState() {
@@ -231,126 +268,16 @@ class WeatherBodyState extends State<WeatherBody> {
                     children: [
                       Expanded (
                         child: Container (
-                              child: ListView.builder(
+                              child: isLoading ?
+                              Container(alignment: Alignment(0.0,-1.0), padding: EdgeInsets.fromLTRB(0, 55, 0, 0), child: CircularProgressIndicator(),)
+                                  :
+                              ListView.builder(
                               itemCount: 1,
                               itemBuilder: (context, i){
                                 return new ListTile(
-                                  title: Container(
-                                    decoration: BoxDecoration(border: Border.all(color: Colors.grey[400]),),
-                                    child:
-                                    curWeatherCallError? // Если сделали запрос и пришла ошибка
-                                    Container (
-                                      // Белая карточка
-                                        color: Colors.white,
-                                        child:
-                                        Row (
-                                          children: [
-                                            Expanded(
-                                              child: Column(
-                                                children:[
-                                                  Container(
-                                                    padding: EdgeInsets.fromLTRB(10, 20, 10, 20),
-                                                    child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                      children: [
-                                                        Container(
-                                                          alignment: Alignment(-1.0, -1.0),
-                                                          child: Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            children: [
-                                                              greyTextView(context, "Error", 22),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                                                    child: Divider(
-                                                      thickness: 1,
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    padding: EdgeInsets.fromLTRB(5, 0, 5, 10),
-                                                    child: greyTextView(context, 'город не найден', 14),
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                    )
-                                        :
-                                    Container (
-                                      // Белая карточка
-                                        color: Colors.white,
-                                        child: Row (
-                                          children: [
-                                            Expanded(
-                                              child: Column(
-                                                children:[
-                                                  // Верхняя часть: Город, страна, иконка и градусы
-                                                  // Нижняя часть: дополнительные фичи
-                                                  Container(
-                                                    padding: EdgeInsets.fromLTRB(20, 20, 10, 20),
-                                                    child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                      children: [
-                                                        // Город и страна
-                                                        // Иконка
-                                                        // Градусы
-                                                        Container(
-                                                          alignment: Alignment(-1.0, -1.0),
-                                                          child: Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            children: [
-                                                              greyTextView(context, _currentWeather["name"], 22),
-                                                              greyTextView(context, _currentWeather["sys"]["country"], 12),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                                          children: <Widget>[
-                                                            Row(
-                                                              children: <Widget>[
-                                                                Container(
-                                                                  alignment: Alignment(1.0, -1.0),
-                                                                  padding: EdgeInsets.fromLTRB(20, 5, 5, 5),
-                                                                  //child: Icon(Icons.cloud),
-                                                                  child: cachedImageLoader(_currentWeather["weather"][0]["icon"]),
-                                                                ),
-                                                                Container(
-                                                                  alignment: Alignment(1.0, -1.0),
-                                                                  padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-                                                                  child: greyTextView(context, '${_currentWeather["main"]["temp"].round()}°C', 24),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                                                    child: Divider(
-                                                      thickness: 1,
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    padding: EdgeInsets.fromLTRB(5, 0, 5, 10),
-                                                    child: clickableGreyTextView(context, 'дополнительные функции', 14),
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          ],
-                                        )
-                                    ),
-                                  ),
-                                  onTap: curWeatherCallError? null : () =>  addToFavorits(_currentWeather["id"].toString()),
+                                  title: Container(child: curWeatherCallError? errorCard(context) : currentWeatherSearchCardWithBtn(context, _currentWeather, isInFavorites(_currentWeather["id"].toString()), pressButton),),
+                                  //onTap: curWeatherCallError? null : () =>  addToFavorites(_currentWeather["id"].toString()),
+                                //)
                                 );
                               }),
                         ),
@@ -363,134 +290,17 @@ class WeatherBodyState extends State<WeatherBody> {
                         child: Container (
                           padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
                           child:
-                          _currentWeatherForFavorits == null ? Container() :
+                          noFavorites ?
+                          Container() // Если нет избранных карт показываем пустой контейнер
+                              :
                           isLoading ?
-                          Container(
-                            alignment: Alignment(0.0,-1.0),
-                            padding: EdgeInsets.fromLTRB(0, 55, 0, 0),
-                            child: CircularProgressIndicator(),
-                          )
+                          Container(alignment: Alignment(0.0,-1.0), padding: EdgeInsets.fromLTRB(0, 55, 0, 0), child: CircularProgressIndicator(),)
                               :
                           ListView.builder(
-                              itemCount: _currentWeatherForFavorits["cnt"],
+                              itemCount: _currentWeatherForFavorites["cnt"],
                               itemBuilder: (context, i){
                                 return new ListTile(
-                                  title: Container(
-                                    decoration: BoxDecoration(border: Border.all(color: Colors.grey[400]),),
-                                    child:
-                                    curWeatherCallErrorForFavorits? // Если сделали запрос и пришла ошибка
-                                    Container (
-                                      // Белая карточка
-                                      color: Colors.white,
-                                      child:
-                                      Row (
-                                        children: [
-                                          Expanded(
-                                            child: Column(
-                                              children:[
-                                                Container(
-                                                  padding: EdgeInsets.fromLTRB(10, 20, 10, 20),
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                    children: [
-                                                      Container(
-                                                        alignment: Alignment(-1.0, -1.0),
-                                                        child: Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          children: [
-                                                            greyTextView(context, "Error", 22),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Container(
-                                                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                                                  child: Divider(
-                                                    thickness: 1,
-                                                  ),
-                                                ),
-                                                Container(
-                                                  padding: EdgeInsets.fromLTRB(5, 0, 5, 10),
-                                                  child: greyTextView(context, 'город не найден', 14),
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                        :
-                                    Container (
-                                      // Белая карточка
-                                        color: Colors.white,
-                                        child: Row (
-                                          children: [
-                                            Expanded(
-                                              child: Column(
-                                                children:[
-                                                  // Верхняя часть: Город, страна, иконка и градусы
-                                                  // Нижняя часть: дополнительные фичи
-                                                  Container(
-                                                    padding: EdgeInsets.fromLTRB(20, 20, 10, 20),
-                                                    child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                      children: [
-                                                        // Город и страна
-                                                        // Иконка
-                                                        // Градусы
-                                                        Container(
-                                                          alignment: Alignment(-1.0, -1.0),
-                                                          child: Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            children: [
-                                                              greyTextView(context, _currentWeatherForFavorits["list"][i]["name"], 22),
-                                                              greyTextView(context, _currentWeatherForFavorits["list"][i]["sys"]["country"], 12),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                                          children: <Widget>[
-                                                            Row(
-                                                              children: <Widget>[
-                                                                Container(
-                                                                  alignment: Alignment(1.0, -1.0),
-                                                                  padding: EdgeInsets.fromLTRB(20, 5, 5, 5),
-                                                                  //child: Icon(Icons.cloud),
-                                                                  child: cachedImageLoader(_currentWeatherForFavorits["list"][i]["weather"][0]["icon"]),
-                                                                ),
-                                                                Container(
-                                                                  alignment: Alignment(1.0, -1.0),
-                                                                  padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-                                                                  child: greyTextView(context, '${_currentWeatherForFavorits["list"][i]["main"]["temp"].round()}°C', 24),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                                                    child: Divider(
-                                                      thickness: 1,
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    padding: EdgeInsets.fromLTRB(5, 0, 5, 10),
-                                                    child: clickableGreyTextView(context, 'дополнительные функции', 14),
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          ],
-                                        )
-                                    ),
-                                  ),
-                                  //onTap: curWeatherCallError? null : () =>  addToFavorits(_currentWeather["id"]),
+                                  title: Container(child: curWeatherCallErrorForFavorites? errorCard(context): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i)),
                                 );
                               }),
                         ),
