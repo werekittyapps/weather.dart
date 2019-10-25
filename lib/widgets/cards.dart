@@ -317,3 +317,81 @@ currentWeatherSearchCardWithBtn(BuildContext context, Map<String, dynamic> map, 
   );
 }
 
+weatherForecast(Map<String, dynamic> map){
+  return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Container(
+          child: Container (
+            // Белая карточка
+            color: Colors.white,
+            child: Row (
+            mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                forecastColumn(map, 0),
+                forecastColumn(map, 10),
+                forecastColumn(map, 20),
+                forecastColumn(map, 30),
+                forecastColumn(map, 40)
+              ],
+            )
+          )
+      )
+  );
+}
+
+forecastColumn(Map<String, dynamic> map, int Index){
+  return Container(
+      height: 500,
+      width: 80,
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child:
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(child: Divider(thickness: 1, height: 1, color: Colors.grey[400],)),
+                Container(
+                    child: Column(
+                      children: <Widget>[
+                        Container(padding: EdgeInsets.only(bottom: 5), child: greyTextViewForForecast("Day", 14)),
+                        Container(child: greyTextViewForForecast("Date", 14)),
+                      ],
+                    )
+                ),
+                Divider(thickness: 1, height: 0, color: Colors.grey[400]),
+                Container(
+                  child: Column(
+                    children: <Widget>[
+                      Container(padding: EdgeInsets.only(bottom: 10), child: cachedImageLoader("url"),),
+                      Container(child: greyTextViewForForecast("state", 14)),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.fromLTRB(0, 0, 0, 90),
+                  child: greyTextViewForForecast("N", 14),
+                ),
+                Container(
+                  padding: EdgeInsets.fromLTRB(0, 90, 0, 0),
+                  child: greyTextViewForForecast("N", 14),
+                ),
+                Container(
+                  child: Column(
+                    children: <Widget>[
+                      Container(padding: EdgeInsets.only(bottom: 10), child: cachedImageLoader("url"),),
+                      Container(padding: EdgeInsets.only(bottom: 5), child: greyTextViewForForecast("state", 14)),
+                      Container(child: greyTextViewForForecast("wind dir", 14)),
+                      Container(child: greyTextViewForForecast("speed", 14)),
+                    ],
+                  ),
+                ),
+                Divider(thickness: 1, height: 0, color: Colors.grey[400])
+              ],
+            ),
+          )
+        ],
+      )
+  );
+}
+

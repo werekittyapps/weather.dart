@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:weather/forecast.dart';
 import 'package:weather/widgets/cards.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,9 +11,8 @@ createState() => new WeatherBodyState();
 }
 
 class WeatherBodyState extends State<WeatherBody> {
-  var _currentWeather;
-  var _currentWeatherForFavorites;
-  List<String> favCities = [];
+  var _currentWeather; // for search
+  var _currentWeatherForFavorites; // for life
   String citiesID = "";
 
   // For search bar
@@ -240,16 +240,11 @@ class WeatherBodyState extends State<WeatherBody> {
     }
   }
 
-  //delete Cache() async{
-  //  print("delete cache");
-  //  SharedPreferences prefs = await SharedPreferences.getInstance();
-  //  prefs.clear();
-  //}
 
   @override
   void initState() {
     getCached();
-    //deleteCache();
+    ////deleteCache();
     super.initState();
   }
 
@@ -301,6 +296,7 @@ class WeatherBodyState extends State<WeatherBody> {
                               itemBuilder: (context, i){
                                 return new ListTile(
                                   title: Container(child: curWeatherCallErrorForFavorites? errorCard(context): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i)),
+                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeatherForFavorites["list"][i]["id"].toString()))),
                                 );
                               }),
                         ),

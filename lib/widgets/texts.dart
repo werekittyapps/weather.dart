@@ -19,6 +19,22 @@ greyTextView (BuildContext context, String text, double textSize) {
   );
 }
 
+greyTextViewForForecast (String text, double textSize) {
+  return RichText(
+    text: TextSpan(
+        children: [
+          TextSpan(
+              text: text,
+              style: TextStyle(
+                  fontSize: textSize,
+                  color: Colors.grey[800]
+              )
+          )
+        ]
+    ),
+  );
+}
+
 clickableGreyTextView (BuildContext context, String text, double textSize) {
   return RichText(
     text: TextSpan(
