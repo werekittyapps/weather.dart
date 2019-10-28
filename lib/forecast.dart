@@ -29,7 +29,6 @@ class ForecastBodyState extends State<ForecastBody> {
   List<dynamic> fifthDayData = [];
 
   weatherForecastCall(String id) async {
-    print("forecast");
     setState(() {
       isLoading = true;
     });
@@ -39,11 +38,8 @@ class ForecastBodyState extends State<ForecastBody> {
       if(response.statusCode == 200) {
         setState(() {
           _forecast = response.data;
-          print("sobaka");
           forecastError = false;
-          print("sobaka");
           forecastHandler();
-          print("sobaka");
           //isLoading = false;
         });
       }
@@ -92,7 +88,6 @@ class ForecastBodyState extends State<ForecastBody> {
   }
 
   forecastHandler(){
-    print("sobaka");
     DateTime first;
     DateTime second;
     int beginOfSecondDay;
@@ -108,8 +103,6 @@ class ForecastBodyState extends State<ForecastBody> {
     List thirdList = [];
     List forthList = [];
     List fifthList = [];
-
-    print("forecast handler");
 
     // разбиваем прогноз по дням
     for (int i = 0; i < list.length; i++){
@@ -143,8 +136,6 @@ class ForecastBodyState extends State<ForecastBody> {
       }
     }
 
-    print("sobaka");
-
     // Выделяем листы данных каждому дню
     for(int i = 0; i < beginOfSecondDay; i++){
       firstList.add(list[i]);
@@ -161,8 +152,6 @@ class ForecastBodyState extends State<ForecastBody> {
     for(int i = beginOfFifthDay; i < beginOfFifthDay + 8; i++){
       fifthList.add(list[i]);
     }
-
-    print("sobaka");
 
     // Обрабатываем данные первого дня
     var firstHighest;
@@ -191,8 +180,6 @@ class ForecastBodyState extends State<ForecastBody> {
         firstLowIcon = firstList[i]["weather"][0]["icon"];
       }
     }
-
-    print("after first");
 
     // Обрабатываем данные второго дня
     var secondHighest;
@@ -309,9 +296,6 @@ class ForecastBodyState extends State<ForecastBody> {
       }
     }
 
-    print("after fors");
-
-
     // Получаем среднестатистическое давление
     firstPressure = (firstPressure/firstList.length).round();
     secondPressure = (secondPressure/secondList.length).round();
@@ -331,82 +315,8 @@ class ForecastBodyState extends State<ForecastBody> {
     forthLowest = (forthLowest).round();
     fifthLowest = (fifthLowest).round();
 
-    print("after pressure");
-
-    //print("1 day: ${first.day} ${weekDay(first.weekday)} 0 and list size ${firstList.length}");
-    //print("2 day: ${second.day} ${weekDay(second.weekday)} $beginOfSecondDay and list size ${secondList.length}"
-    //    "temp: $secondHighest/$secondLowest icons: $secondHighIcon/$secondLowIcon "
-    //    "states: $secondHighState/$secondLowState pressure: $secondPressure");
-    //print("3 day: ${third.day} ${weekDay(third.weekday)} $beginOfThirdDay and list size ${thirdList.length}"
-    //    "temp: $thirdHighest/$thirdLowest icons: $thirdHighIcon/$thirdLowIcon "
-    //    "states: $thirdHighState/$thirdLowState pressure: $thirdPressure");
-    //print("4 day: ${forth.day} ${weekDay(forth.weekday)} $beginOfForthDay and list size ${forthList.length}"
-    //    "temp: $forthHighest/$forthLowest icons: $forthHighIcon/$forthLowIcon "
-    //    "states: $forthHighState/$forthLowState pressure: $forthPressure");
-    //print("5 day: ${fifth.day} ${weekDay(fifth.weekday)} $beginOfFifthDay and list size ${fifthList.length}"
-    //    "temp: $fifthHighest/$fifthLowest icons: $fifthHighIcon/$fifthLowIcon "
-    //    "states: $fifthHighState/$fifthLowState pressure: $fifthPressure");
-
-    //firstDayData[0] = "Сегодня";
-    //firstDayData[1] = "${first.day}.${first.month}";
-    //firstDayData[2] = firstHighIcon.replaceAll("d", "n");
-    //firstDayData[3] = firstHighState;
-    //firstDayData[4] = firstHighest;
-    //firstDayData[5] = firstLowest;
-    //firstDayData[6] = firstLowIcon.replaceAll("d", "n");
-    //firstDayData[7] = firstLowState;
-    //firstDayData[8] = firstPressure;
-    //
-    //secondDayData[0] = "Завтра";
-    //secondDayData[1] = "${second.day}.${second.month}";
-    //secondDayData[2] = secondHighIcon.replaceAll("d", "n");
-    //secondDayData[3] = secondHighState;
-    //secondDayData[4] = secondHighest;
-    //secondDayData[5] = secondLowest;
-    //secondDayData[6] = secondLowIcon.replaceAll("d", "n");
-    //secondDayData[7] = secondLowState;
-    //secondDayData[8] = secondPressure;
-//
-    //thirdDayData[0] = "${weekDay(third.weekday)}";
-    //thirdDayData[1] = "${third.day}.${third.month}";
-    //thirdDayData[2] = thirdHighIcon.replaceAll("d", "n");
-    //thirdDayData[3] = thirdHighState;
-    //thirdDayData[4] = thirdHighest;
-    //thirdDayData[5] = thirdLowest;
-    //thirdDayData[6] = thirdLowIcon.replaceAll("d", "n");
-    //thirdDayData[7] = thirdLowState;
-    //thirdDayData[8] = thirdPressure;
-//
-    //forthDayData[0] = "${weekDay(forth.weekday)}";
-    //forthDayData[1] = "${forth.day}.${forth.month}";
-    //forthDayData[2] = forthHighIcon.replaceAll("d", "n");
-    //forthDayData[3] = forthHighState;
-    //forthDayData[4] = forthHighest;
-    //forthDayData[5] = forthLowest;
-    //forthDayData[6] = forthLowIcon.replaceAll("d", "n");
-    //forthDayData[7] = forthLowState;
-    //forthDayData[8] = forthPressure;
-//
-    //fifthDayData[0] = "${weekDay(fifth.weekday)}";
-    //fifthDayData[1] = "${fifth.day}.${fifth.month}";
-    //fifthDayData[2] = fifthHighIcon.replaceAll("d", "n");
-    //fifthDayData[3] = fifthHighState;
-    //fifthDayData[4] = fifthHighest;
-    //fifthDayData[5] = fifthLowest;
-    //fifthDayData[6] = fifthLowIcon.replaceAll("d", "n");
-    //fifthDayData[7] = fifthLowState;
-    //fifthDayData[8] = fifthPressure;
-
-    //secondDayData[0] = "${weekDay(first.weekday)}";
-
-    //I/flutter ( 2535): 1 day: 28 Пн 0 and list size 4
-    //I/flutter ( 2535): 2 day: 29 Вт 4 and list size 8temp: 8.73/4.7 icons: 04d/01n states: Clouds/Clear pressure: 1024
-    //I/flutter ( 2535): 3 day: 30 Ср 12 and list size 8temp: 7.52/1.42 icons: 01d/01d states: Clear/Clear pressure: 1030
-    //I/flutter ( 2535): 4 day: 31 Чт 20 and list size 8temp: 7.79/0.26 icons: 01d/01d states: Clear/Clear pressure: 1027
-    //I/flutter ( 2535): 5 day: 1 Пт 28 and list size 8temp: 8.02/0.08 icons: 04d/04d states: Clouds/Clouds pressure: 1019
-
     setState(() {
-      print("зыгружаем листы");
+      print("Bыгружаем листы");
       isLoading = false;
       firstDayData.add("Сегодня");
       firstDayData.add("${first.day}.${first.month}");
@@ -488,9 +398,8 @@ class ForecastBodyState extends State<ForecastBody> {
               //child: weatherForecast(_forecast),
               child: isLoading ?
               Container(alignment: Alignment(0.0,-1.0), padding: EdgeInsets.fromLTRB(0, 55, 0, 0), child: CircularProgressIndicator())
-                  //: forecastError? errorCard(context)
+                  : forecastError? Container(height: 120, padding: EdgeInsets.fromLTRB(20, 10, 20, 0), child: errorCard(context))
                   : weatherForecast(firstDayData, secondDayData, thirdDayData, forthDayData, fifthDayData),
-              //: Container()
             ),
             new Positioned(
               top: 0.0, left: 0.0, right: 0.0,

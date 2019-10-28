@@ -106,6 +106,7 @@ class WeatherBodyState extends State<WeatherBody> {
       if(response.statusCode == 200) {
         setState(() {
           _currentWeatherForFavorites = response.data;
+          print(_currentWeatherForFavorites["cnt"]);
           curWeatherCallErrorForFavorites = false;
           isLoading = false;
         });
@@ -166,7 +167,9 @@ class WeatherBodyState extends State<WeatherBody> {
     if(!noData){
       noFavorites = false;
       citiesID = favorsID;
-      print(citiesID);
+      citiesID = dealWithDuplicated(citiesID);
+      prefs.setString('favorites', citiesID);
+      print("citiesID: $citiesID");
       currentWeatherForFavorites(citiesID);
     }
     print(noData);
@@ -230,8 +233,8 @@ class WeatherBodyState extends State<WeatherBody> {
   addToFavorites(String id) async {
     print("add to favorites");
     SharedPreferences getDataPrefs = await SharedPreferences.getInstance();
-    print(id);
-    if (citiesID != null){
+    print("id in add to favorites: $id");
+    if (citiesID != ""){
       citiesID += ",$id";
       getDataPrefs.setString('favorites', citiesID);
     } else {
@@ -240,11 +243,47 @@ class WeatherBodyState extends State<WeatherBody> {
     }
   }
 
+  String dealWithDuplicated(String id){
+    var list = [];
+    var ids = id;
+    if (id != ""){
+      list = id.split(",").toList();
+      if(list.length != 1 ){
+        ids = "";
+        print(ids);
+        for(int i = 0; i < list.length - 1; i++) {
+          for (int j = i + 1; j < list.length; j++) {
+            if (list[i] == list[j]) {
+              list.removeAt(j);
+              j = j - 1;
+            }
+          }
+        }
+      }
+    }
+    if(id != "" && list != null && list.length != 1){
+      for(int i = 0; i < list.length; i++) {
+        if(list.length - i > 1){
+          ids += "${list[i]},";
+        } else {
+          ids += list[i];
+        }
+      }
+    }
+    return ids;
+  }
+
+  deleteCache() async{
+    SharedPreferences getDataPrefs = await SharedPreferences.getInstance();
+    getDataPrefs.clear();
+  }
+
 
   @override
   void initState() {
     getCached();
-    ////deleteCache();
+    //deleteCache();
+
     super.initState();
   }
 
