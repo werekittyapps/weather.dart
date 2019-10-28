@@ -5,16 +5,18 @@ import 'package:dio/dio.dart';
 
 class ForecastBody extends StatefulWidget {
   final String id;
-  ForecastBody({this.id});
+  final String city;
+  ForecastBody({this.id, this.city});
 
   @override
-  createState() => new ForecastBodyState(id);
+  createState() => new ForecastBodyState(id, city);
 }
 
 
 class ForecastBodyState extends State<ForecastBody> {
   final String id;
-  ForecastBodyState(this.id);
+  final String city;
+  ForecastBodyState(this.id, this.city);
 
   var _forecast; // for forecast
   bool forecastError = false;
@@ -398,13 +400,13 @@ class ForecastBodyState extends State<ForecastBody> {
               //child: weatherForecast(_forecast),
               child: isLoading ?
               Container(alignment: Alignment(0.0,-1.0), padding: EdgeInsets.fromLTRB(0, 55, 0, 0), child: CircularProgressIndicator())
-                  : forecastError? Container(height: 120, padding: EdgeInsets.fromLTRB(20, 10, 20, 0), child: errorCard(context))
+                  : forecastError? Container(height: 120, padding: EdgeInsets.fromLTRB(20, 10, 20, 0), child: errorCardForForecast())
                   : weatherForecast(firstDayData, secondDayData, thirdDayData, forthDayData, fifthDayData),
             ),
             new Positioned(
               top: 0.0, left: 0.0, right: 0.0,
               child: AppBar(
-                title: Text('Forecast'),
+                title: Text('$city'),
                 backgroundColor: Colors.transparent,
                 elevation: 0.0,
               ),

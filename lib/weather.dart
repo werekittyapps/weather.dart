@@ -24,10 +24,12 @@ class WeatherBodyState extends State<WeatherBody> {
   bool noFavorites = true;
   bool searchFlag = false;
   bool isLoading = false;
+  bool editFlag = false;
   bool curWeatherCallError = false;
   bool curWeatherCallErrorForFavorites = false;
   String curWeatherCallErrorMessage = "";
   String curWeatherCallErrorMessageForFavorites = "";
+
 
   currentWeather(String city) async {
     print("current wheater");
@@ -186,7 +188,7 @@ class WeatherBodyState extends State<WeatherBody> {
         this._appBarTitle = new TextField(
             controller: _filter,
             decoration: new InputDecoration(
-              prefixIcon: new Icon(Icons.add),
+              prefixIcon: new Icon(Icons.search),
               hintText: 'Search...',),
           onSubmitted: (value) {
               String city = value.trim().replaceAll(" ", "%20").replaceAll("\n", "");
@@ -203,15 +205,41 @@ class WeatherBodyState extends State<WeatherBody> {
     });
   }
 
+  startEditing(){
+    print("start editing");
+    setState(() {
+      editFlag = true;
+      this._searchIcon = new Icon(Icons.close);
+      this._appBarTitle = new Text( 'Editing...' );
+    });
+  }
+
+  closeEditing(){
+    if (this._searchIcon.icon == Icons.close && editFlag) {
+      setState(() {
+        print("close editing");
+        this._searchIcon = new Icon(Icons.add);
+        this._appBarTitle = new Text('Weather');
+        editFlag = false;
+        getCached();
+      });
+    }
+  }
+
   deleteFromFavorites(String id) async {
     print("delete from favorites");
     SharedPreferences getDataPrefs = await SharedPreferences.getInstance();
+    print("shared prefs");
     if (citiesID.contains("$id,")) {
       citiesID = citiesID.replaceAll("$id,", "");
       getDataPrefs.setString('favorites', citiesID);
     } else {
+      print("else");
       citiesID = null;
+      print("citiesID: is like nothing");
       getDataPrefs.setString('favorites', citiesID);
+      print(citiesID);
+      print("prefs setted");
     }
   }
   
@@ -231,6 +259,7 @@ class WeatherBodyState extends State<WeatherBody> {
   }
 
   addToFavorites(String id) async {
+    if(citiesID==null) citiesID = "";
     print("add to favorites");
     SharedPreferences getDataPrefs = await SharedPreferences.getInstance();
     print("id in add to favorites: $id");
@@ -244,6 +273,7 @@ class WeatherBodyState extends State<WeatherBody> {
   }
 
   String dealWithDuplicated(String id){
+    print("deal with dublicated");
     var list = [];
     var ids = id;
     if (id != ""){
@@ -281,8 +311,8 @@ class WeatherBodyState extends State<WeatherBody> {
 
   @override
   void initState() {
-    getCached();
-    //deleteCache();
+    //getCached();
+    deleteCache();
 
     super.initState();
   }
@@ -310,7 +340,7 @@ class WeatherBodyState extends State<WeatherBody> {
                               itemBuilder: (context, i){
                                 return new ListTile(
                                   title: Container(child: curWeatherCallError? errorCard(context) : currentWeatherSearchCardWithBtn(context, _currentWeather, isInFavorites(_currentWeather["id"].toString()), pressButton),),
-                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeather["id"].toString()))),
+                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeather["id"].toString(), city: _currentWeather["name"].toString()))),
                                 //)
                                 );
                               }),
@@ -334,8 +364,9 @@ class WeatherBodyState extends State<WeatherBody> {
                               itemCount: _currentWeatherForFavorites["cnt"],
                               itemBuilder: (context, i){
                                 return new ListTile(
-                                  title: Container(child: curWeatherCallErrorForFavorites? errorCard(context): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i)),
-                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeatherForFavorites["list"][i]["id"].toString()))),
+                                  title: Container(child: curWeatherCallErrorForFavorites? errorCard(context): editFlag ? currentWeatherSearchCardWithDeleteBtn(context,_currentWeatherForFavorites, i, citiesID) : currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i)),
+                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeatherForFavorites["list"][i]["id"].toString(), city: _currentWeatherForFavorites["list"][i]["name"].toString()))),
+                                  onLongPress: () => startEditing(),
                                 );
                               }),
                         ),
@@ -354,6 +385,7 @@ class WeatherBodyState extends State<WeatherBody> {
                     color: Colors.grey[800],
                     onPressed: () {
                       searching();
+                      closeEditing();
                       },
                   ),],
               ),
