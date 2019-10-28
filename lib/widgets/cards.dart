@@ -317,7 +317,10 @@ currentWeatherSearchCardWithBtn(BuildContext context, Map<String, dynamic> map, 
   );
 }
 
-weatherForecast(Map<String, dynamic> map){
+//weatherForecast(Map<String, dynamic> map){
+weatherForecast(List<dynamic> first, List<dynamic> second, List<dynamic> third,
+    List<dynamic> forth, List<dynamic> fifth){
+
   return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Container(
@@ -327,11 +330,11 @@ weatherForecast(Map<String, dynamic> map){
             child: Row (
             mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                forecastColumn(map, 0),
-                forecastColumn(map, 10),
-                forecastColumn(map, 20),
-                forecastColumn(map, 30),
-                forecastColumn(map, 40)
+                forecastColumn(first),
+                forecastColumn(second),
+                forecastColumn(third),
+                forecastColumn(forth),
+                forecastColumn(fifth)
               ],
             )
           )
@@ -339,9 +342,10 @@ weatherForecast(Map<String, dynamic> map){
   );
 }
 
-forecastColumn(Map<String, dynamic> map, int Index){
+//forecastColumn(Map<String, dynamic> map, int Index){
+forecastColumn(List<dynamic> list){
   return Container(
-      height: 500,
+      height: 520,
       width: 80,
       child: Row(
         children: <Widget>[
@@ -354,8 +358,8 @@ forecastColumn(Map<String, dynamic> map, int Index){
                 Container(
                     child: Column(
                       children: <Widget>[
-                        Container(padding: EdgeInsets.only(bottom: 5), child: greyTextViewForForecast("Day", 14)),
-                        Container(child: greyTextViewForForecast("Date", 14)),
+                        Container(padding: EdgeInsets.fromLTRB(0, 10, 0, 5), child: greyTextViewForForecast(list[0].toString(), 14)),
+                        Container(padding: EdgeInsets.only(bottom: 10), child: greyTextViewForForecast(list[1].toString(), 14)),
                       ],
                     )
                 ),
@@ -363,26 +367,26 @@ forecastColumn(Map<String, dynamic> map, int Index){
                 Container(
                   child: Column(
                     children: <Widget>[
-                      Container(padding: EdgeInsets.only(bottom: 10), child: cachedImageLoader("url"),),
-                      Container(child: greyTextViewForForecast("state", 14)),
+                      Container(padding: EdgeInsets.only(bottom: 10), child: cachedImageLoader(list[2].toString()),),
+                      Container(child: greyTextViewForForecast(list[3].toString().toString(), 14)),
                     ],
                   ),
                 ),
                 Container(
                   padding: EdgeInsets.fromLTRB(0, 0, 0, 90),
-                  child: greyTextViewForForecast("N", 14),
+                  child: greyTextViewForForecast("${list[4]}°C", 28),
                 ),
                 Container(
                   padding: EdgeInsets.fromLTRB(0, 90, 0, 0),
-                  child: greyTextViewForForecast("N", 14),
+                  child: greyTextViewForForecast("${list[5]}°C", 28),
                 ),
                 Container(
                   child: Column(
                     children: <Widget>[
-                      Container(padding: EdgeInsets.only(bottom: 10), child: cachedImageLoader("url"),),
-                      Container(padding: EdgeInsets.only(bottom: 5), child: greyTextViewForForecast("state", 14)),
-                      Container(child: greyTextViewForForecast("wind dir", 14)),
-                      Container(child: greyTextViewForForecast("speed", 14)),
+                      Container(child: cachedImageLoader(list[6].toString()),),
+                      Container(padding: EdgeInsets.only(bottom: 10), child: greyTextViewForForecast(list[7].toString(), 14)),
+                      Container(child: greyTextViewForForecast("давление", 14)),
+                      Container(padding: EdgeInsets.only(bottom: 10), child: greyTextViewForForecast(list[8].toString(), 14)),
                     ],
                   ),
                 ),

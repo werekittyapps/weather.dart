@@ -271,7 +271,7 @@ class WeatherBodyState extends State<WeatherBody> {
                               itemBuilder: (context, i){
                                 return new ListTile(
                                   title: Container(child: curWeatherCallError? errorCard(context) : currentWeatherSearchCardWithBtn(context, _currentWeather, isInFavorites(_currentWeather["id"].toString()), pressButton),),
-                                  //onTap: curWeatherCallError? null : () =>  addToFavorites(_currentWeather["id"].toString()),
+                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeather["id"].toString()))),
                                 //)
                                 );
                               }),
