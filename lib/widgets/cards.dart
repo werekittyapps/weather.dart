@@ -147,7 +147,7 @@ currentWeatherSearchCard(BuildContext context, Map<String, dynamic> map, bool is
 currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i, String citiesID, Function function, bool editFlag) {
 
   press(String id){
-    deleteFromFavoritesUtils(id, citiesID, function);
+    deleteFromFavoritesUtils(id, citiesID, function, i);
   }
 
   return Container(

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:weather/forecast.dart';
@@ -15,6 +17,7 @@ class WeatherBodyState extends State<WeatherBody> {
   var _currentWeather; // for search
   var _currentWeatherForFavorites; // for life
   String citiesID = "";
+  int cityPosition;
 
   // For search bar
   Widget _appBarTitle = new Text( 'Weather' );
@@ -29,8 +32,6 @@ class WeatherBodyState extends State<WeatherBody> {
   bool editFlag = false;
   bool curWeatherCallError = false;
   bool curWeatherCallErrorForFavorites = false;
-  String curWeatherCallErrorMessage = "";
-  String curWeatherCallErrorMessageForFavorites = "";
 
   weatherCall(String cities, bool inSearchFlag) async {
     print("wheater call");
@@ -46,81 +47,38 @@ class WeatherBodyState extends State<WeatherBody> {
       }
       debugPrint("response ${response.statusCode}");
       if(response.statusCode == 200) {
-        setState(() {
-          if(inSearchFlag) {
+        if(inSearchFlag) {
+          setState(() {
             _currentWeather = response.data;
             curWeatherCallError = false;
             searchFlag = true;
-          } else {
+            isLoading = false;
+          });
+        } else {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          var data = response.data;
+          prefs.setString('favoriteWeatherCache', json.encode(data));
+          setState(() {
             _currentWeatherForFavorites = response.data;
             curWeatherCallErrorForFavorites = false;
-          }
-          isLoading = false;
-        });
+            isLoading = false;
+          });
+        }
       }
-      if(response.statusCode == 400) {
+      if(response.statusCode == 400 || response.statusCode == 404 ||
+          response.statusCode == 429 || response.statusCode == 500 ||
+          response.statusCode == 503) {
+        // 400 - "Некорректный запрос"
+        // 404 - "Такого города не найдено"
+        // 429 - "Исчерпан лимит запросов"
+        // 500 - "Internal Server Error: ошибка соединения с сервером"
+        // 503 - "Сервер недоступен"
         setState(() {
           if(inSearchFlag) {
             curWeatherCallError = true;
-            curWeatherCallErrorMessage = "Некорректный запрос";
             searchFlag = true;
           } else {
-            curWeatherCallErrorForFavorites = true;
-            curWeatherCallErrorMessageForFavorites = "Некорректный запрос";
-          }
-          isLoading = false;
-        });
-
-
-      }
-      if(response.statusCode == 404) {
-        setState(() {
-          if(inSearchFlag) {
-            curWeatherCallError = true;
-            curWeatherCallErrorMessage = "Такого города не найдено";
-            searchFlag = true;
-          } else {
-            curWeatherCallErrorForFavorites = true;
-            curWeatherCallErrorMessageForFavorites = "Такого города не найдено";
-          }
-          isLoading = false;
-        });
-      }
-      if(response.statusCode == 429) {
-        setState(() {
-          if(inSearchFlag) {
-            curWeatherCallError = true;
-            curWeatherCallErrorMessage = "Исчерпан лимит запросов";
-            searchFlag = true;
-          } else {
-            curWeatherCallErrorForFavorites = true;
-            curWeatherCallErrorMessageForFavorites = "Исчерпан лимит запросов";
-          }
-          isLoading = false;
-        });
-      }
-      if(response.statusCode == 500) {
-        setState(() {
-          if(inSearchFlag) {
-            curWeatherCallError = true;
-            curWeatherCallErrorMessage = "Internal Server Error: ошибка соединения с сервером";
-            searchFlag = true;
-          } else {
-            curWeatherCallErrorForFavorites = true;
-            curWeatherCallErrorMessageForFavorites = "Internal Server Error: ошибка соединения с сервером";
-          }
-          isLoading = false;
-        });
-      }
-      if(response.statusCode == 503) {
-        setState(() {
-          if(inSearchFlag) {
-            curWeatherCallError = true;
-            curWeatherCallErrorMessage = "Сервер недоступен";
-            searchFlag = true;
-          } else {
-            curWeatherCallErrorForFavorites = true;
-            curWeatherCallErrorMessageForFavorites = "Сервер недоступен";
+            getCachedWeather();
           }
           isLoading = false;
         });
@@ -129,15 +87,31 @@ class WeatherBodyState extends State<WeatherBody> {
       setState(() {
         if(inSearchFlag) {
           curWeatherCallError = true;
-          curWeatherCallErrorMessage = "Ошибка запроса: проверьте подключение";
           searchFlag = true;
         } else {
-          curWeatherCallErrorForFavorites = true;
-          curWeatherCallErrorMessageForFavorites = "Ошибка запроса: проверьте подключение";
+          getCachedWeather();
         }
         isLoading = false;
       });
     }
+  }
+
+  getCachedWeather() async{
+    var noData = false;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var cache = (prefs.getString('favoriteWeatherCache') ?? {
+      curWeatherCallErrorForFavorites = true,
+      print("No cached favorite weather"),
+      noData = true,
+    });
+    if(!noData){
+      setState(() {
+        _currentWeatherForFavorites = json.decode(cache);
+      });
+    }
+    setState(() {
+      curWeatherCallErrorForFavorites = curWeatherCallErrorForFavorites;
+    });
   }
 
   getCached() async{
@@ -211,13 +185,28 @@ class WeatherBodyState extends State<WeatherBody> {
   }
   
   isInFavorites(String id){
-    if (citiesID != null && citiesID.contains("$id")) return true;
-    return false;
+    bool isIn = false;
+    if(citiesID != null) {
+      List list = [];
+      list = citiesID.split(",").toList();
+      for(int i = 0; i < list.length; i++){
+        if (list[i] == id){
+          cityPosition = i;
+          isIn = true;
+        }
+      }
+    }
+    return isIn;
   }
+
+  //isInFavorites(String id){
+  //  if (citiesID != null && citiesID.contains("$id")) return true;
+  //  return false;
+  //}
 
   pressButton() {
     setState(() {
-      if(isInFavorites(_currentWeather["id"].toString())) deleteFromFavoritesUtils(_currentWeather["id"].toString(), citiesID, getCached);
+      if(isInFavorites(_currentWeather["id"].toString())) deleteFromFavoritesUtils(_currentWeather["id"].toString(), citiesID, getCached, cityPosition);
       else addToFavorites(_currentWeather["id"].toString());
       isInFavorites(_currentWeather["id"].toString());
     });
@@ -230,7 +219,6 @@ class WeatherBodyState extends State<WeatherBody> {
     if (citiesID != ""){
       citiesID += ",$id";
       getDataPrefs.setString('favorites', citiesID);
-      //getDataPrefs.setString('favorites', null);
     } else {
       citiesID = "$id";
       getDataPrefs.setString('favorites', citiesID);
@@ -254,7 +242,6 @@ class WeatherBodyState extends State<WeatherBody> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.grey[300],
-        //appBar:
         body: Stack(
           children: <Widget>[
             Container(
@@ -274,7 +261,6 @@ class WeatherBodyState extends State<WeatherBody> {
                                 return new ListTile(
                                   title: Container(child: curWeatherCallError? errorCard(context, curWeatherCallError) : currentWeatherSearchCard(context, _currentWeather, isInFavorites(_currentWeather["id"].toString()), pressButton),),
                                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeather["id"].toString(), city: _currentWeather["name"].toString(), caching: false,))),
-                                //)
                                 );
                               }),
                         ),

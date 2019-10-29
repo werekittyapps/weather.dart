@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 deleteForecastFromCacheUtils(String id) async{
@@ -5,7 +7,22 @@ deleteForecastFromCacheUtils(String id) async{
   prefs.setString('forecastFor$id', null);
 }
 
-deleteFromFavoritesUtils(String id, String citiesID, Function function) async {
+deleteFavoriteWeatherCache(int cityPosition) async{
+  var noData = false;
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var cache = (prefs.getString('favoriteWeatherCache') ?? {
+    print("No cached favorite weather"),
+    noData = true,
+  });
+  if(!noData){
+    var cachedWeather = json.decode(cache);
+    cachedWeather["list"][cityPosition] = null;
+    cachedWeather["cnt"] = cachedWeather["cnt"] - 1;
+    prefs.setString('favoriteWeatherCache', json.encode(cachedWeather));
+  }
+}
+
+deleteFromFavoritesUtils(String id, String citiesID, Function function, int cityPosition) async {
   print("delete from utils");
   SharedPreferences getDataPrefs = await SharedPreferences.getInstance();
   if (citiesID.contains(",$id")) {
@@ -20,6 +37,7 @@ deleteFromFavoritesUtils(String id, String citiesID, Function function) async {
   }
   getDataPrefs.setString('favorites', citiesID);
   deleteForecastFromCacheUtils(id);
+  deleteFavoriteWeatherCache(cityPosition);
   function();
 }
 
