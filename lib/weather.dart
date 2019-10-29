@@ -23,6 +23,7 @@ class WeatherBodyState extends State<WeatherBody> {
   // Flags
   bool noFavorites = true;
   bool searchFlag = false;
+  bool inSearchFlag = false;
   bool isLoading = false;
   bool editFlag = false;
   bool curWeatherCallError = false;
@@ -30,128 +31,109 @@ class WeatherBodyState extends State<WeatherBody> {
   String curWeatherCallErrorMessage = "";
   String curWeatherCallErrorMessageForFavorites = "";
 
-
-  currentWeather(String city) async {
-    print("current wheater");
+  weatherCall(String cities, bool inSearchFlag) async {
+    print("wheater call");
     setState(() {
       isLoading = true;
     });
     try {
-      Response response = await Dio().get("https://api.openweathermap.org/data/2.5/weather?q=$city&appid=7fe8b89a7579b408a6997d47eb97164c&units=metric");
-      debugPrint("current weather response ${response.statusCode}");
+      Response response;
+      if(inSearchFlag){
+        response = await Dio().get("https://api.openweathermap.org/data/2.5/weather?q=$cities&appid=7fe8b89a7579b408a6997d47eb97164c&units=metric");
+      } else {
+        response = await Dio().get("https://api.openweathermap.org/data/2.5/group?id=$cities&units=metric&appid=7fe8b89a7579b408a6997d47eb97164c");
+      }
+      debugPrint("response ${response.statusCode}");
       if(response.statusCode == 200) {
-        _currentWeather = response.data;
         setState(() {
-          curWeatherCallError = false;
-          searchFlag = true;
+          if(inSearchFlag) {
+            _currentWeather = response.data;
+            curWeatherCallError = false;
+            searchFlag = true;
+          } else {
+            _currentWeatherForFavorites = response.data;
+            curWeatherCallErrorForFavorites = false;
+          }
           isLoading = false;
         });
       }
       if(response.statusCode == 400) {
         setState(() {
-          curWeatherCallError = true;
-          curWeatherCallErrorMessage = "Некорректный запрос";
-          searchFlag = true;
+          if(inSearchFlag) {
+            curWeatherCallError = true;
+            curWeatherCallErrorMessage = "Некорректный запрос";
+            searchFlag = true;
+          } else {
+            curWeatherCallErrorForFavorites = true;
+            curWeatherCallErrorMessageForFavorites = "Некорректный запрос";
+          }
           isLoading = false;
         });
-      }
-      if(response.statusCode == 404) {
-        setState(() {
-          curWeatherCallError = true;
-          curWeatherCallErrorMessage = "Такого города не найдено";
-          searchFlag = true;
-          isLoading = false;
-        });
-      }
-      if(response.statusCode == 429) {
-        setState(() {
-          curWeatherCallError = true;
-          curWeatherCallErrorMessage = "Исчерпан лимит запросов";
-          searchFlag = true;
-          isLoading = false;
-        });
-      }
-      if(response.statusCode == 500) {
-        setState(() {
-          curWeatherCallError = true;
-          curWeatherCallErrorMessage = "Internal Server Error: ошибка соединения с сервером";
-          searchFlag = true;
-          isLoading = false;
-        });
-      }
-      if(response.statusCode == 503) {
-        setState(() {
-          curWeatherCallError = true;
-          curWeatherCallErrorMessage = "Сервер недоступен";
-          searchFlag = true;
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        curWeatherCallError = true;
-        curWeatherCallErrorMessage = "Ошибка запроса: проверьте подключение";
-        searchFlag = true;
-        isLoading = false;
-      });
-    }
-  }
 
-  currentWeatherForFavorites(String listOfID) async {
-    print("current wheater for favorites");
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      Response response = await Dio().get("https://api.openweathermap.org/data/2.5/group?id=$listOfID&units=metric&appid=7fe8b89a7579b408a6997d47eb97164c");
-      debugPrint("favorites weather response ${response.statusCode}");
-      if(response.statusCode == 200) {
-        setState(() {
-          _currentWeatherForFavorites = response.data;
-          print(_currentWeatherForFavorites["cnt"]);
-          curWeatherCallErrorForFavorites = false;
-          isLoading = false;
-        });
-      }
-      if(response.statusCode == 400) {
-        setState(() {
-          curWeatherCallErrorForFavorites = true;
-          curWeatherCallErrorMessageForFavorites = "Некорректный запрос";
-          isLoading = false;
-        });
+
       }
       if(response.statusCode == 404) {
         setState(() {
-          curWeatherCallErrorForFavorites = true;
-          curWeatherCallErrorMessageForFavorites = "Такого города не найдено";
+          if(inSearchFlag) {
+            curWeatherCallError = true;
+            curWeatherCallErrorMessage = "Такого города не найдено";
+            searchFlag = true;
+          } else {
+            curWeatherCallErrorForFavorites = true;
+            curWeatherCallErrorMessageForFavorites = "Такого города не найдено";
+          }
           isLoading = false;
         });
       }
       if(response.statusCode == 429) {
         setState(() {
-          curWeatherCallErrorForFavorites = true;
-          curWeatherCallErrorMessageForFavorites = "Исчерпан лимит запросов";
+          if(inSearchFlag) {
+            curWeatherCallError = true;
+            curWeatherCallErrorMessage = "Исчерпан лимит запросов";
+            searchFlag = true;
+          } else {
+            curWeatherCallErrorForFavorites = true;
+            curWeatherCallErrorMessageForFavorites = "Исчерпан лимит запросов";
+          }
           isLoading = false;
         });
       }
       if(response.statusCode == 500) {
         setState(() {
-          curWeatherCallErrorForFavorites = true;
-          curWeatherCallErrorMessageForFavorites = "Internal Server Error: ошибка соединения с сервером";
+          if(inSearchFlag) {
+            curWeatherCallError = true;
+            curWeatherCallErrorMessage = "Internal Server Error: ошибка соединения с сервером";
+            searchFlag = true;
+          } else {
+            curWeatherCallErrorForFavorites = true;
+            curWeatherCallErrorMessageForFavorites = "Internal Server Error: ошибка соединения с сервером";
+          }
           isLoading = false;
         });
       }
       if(response.statusCode == 503) {
         setState(() {
-          curWeatherCallErrorForFavorites = true;
-          curWeatherCallErrorMessageForFavorites = "Сервер недоступен";
+          if(inSearchFlag) {
+            curWeatherCallError = true;
+            curWeatherCallErrorMessage = "Сервер недоступен";
+            searchFlag = true;
+          } else {
+            curWeatherCallErrorForFavorites = true;
+            curWeatherCallErrorMessageForFavorites = "Сервер недоступен";
+          }
           isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
-        curWeatherCallErrorForFavorites = true;
-        curWeatherCallErrorMessageForFavorites = "Ошибка запроса: проверьте подключение";
+        if(inSearchFlag) {
+          curWeatherCallError = true;
+          curWeatherCallErrorMessage = "Ошибка запроса: проверьте подключение";
+          searchFlag = true;
+        } else {
+          curWeatherCallErrorForFavorites = true;
+          curWeatherCallErrorMessageForFavorites = "Ошибка запроса: проверьте подключение";
+        }
         isLoading = false;
       });
     }
@@ -173,7 +155,8 @@ class WeatherBodyState extends State<WeatherBody> {
       citiesID = dealWithDuplicated(citiesID);
       prefs.setString('favorites', citiesID);
       print("citiesID: $citiesID");
-      currentWeatherForFavorites(citiesID);
+      weatherCall(citiesID, inSearchFlag);
+      //currentWeatherForFavorites(citiesID);
     }
     print(noData);
     setState(() {
@@ -184,6 +167,7 @@ class WeatherBodyState extends State<WeatherBody> {
   searching(){
     setState(() {
       if (this._searchIcon.icon == Icons.add) {
+        inSearchFlag = true;
         this._searchIcon = new Icon(Icons.close);
         this._appBarTitle = new TextField(
             controller: _filter,
@@ -192,12 +176,13 @@ class WeatherBodyState extends State<WeatherBody> {
               hintText: 'Search...',),
           onSubmitted: (value) {
               String city = value.trim().replaceAll(" ", "%20").replaceAll("\n", "");
-              if(city.isNotEmpty) currentWeather(city);
+              if(city.isNotEmpty) weatherCall(city, inSearchFlag);
               },
             );
       } else {
         this._searchIcon = new Icon(Icons.add);
         this._appBarTitle = new Text('Weather');
+        inSearchFlag = false;
         searchFlag = false;
         _filter.clear();
         getCached();
@@ -227,11 +212,12 @@ class WeatherBodyState extends State<WeatherBody> {
   deleteFromFavorites(String id) async {
     print("delete from favorites");
     SharedPreferences getDataPrefs = await SharedPreferences.getInstance();
-    if (citiesID.contains("$id,")) {
-      citiesID = citiesID.replaceAll("$id,", "");
+    if (citiesID.contains(",$id")) {
+      citiesID = citiesID.replaceAll(",$id", "");
       getDataPrefs.setString('favorites', citiesID);
     } else {
-      citiesID = null;
+      citiesID = citiesID.replaceAll("$id", "");
+      if(citiesID == "") citiesID = null;
       getDataPrefs.setString('favorites', citiesID);
       print(citiesID);
     }
@@ -299,11 +285,10 @@ class WeatherBodyState extends State<WeatherBody> {
     getDataPrefs.clear();
   }
 
-
   @override
   void initState() {
-    //getCached();
-    deleteCache();
+    getCached();
+    //deleteCache();
 
     super.initState();
   }

@@ -121,7 +121,7 @@ currentWeatherSearchCard(BuildContext context, Map<String, dynamic> map, bool is
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            clickableGreyTextView(context, 'Влажность ${map["main"]["humidity"].round()}% | '
+                            greyTextView(context, 'Влажность ${map["main"]["humidity"].round()}% | '
                                 '${map["wind"]["deg"] == null ? "?"
                                 : map["wind"]["deg"] > 337.5 || map["wind"]["deg"] < 22.5 ? "С"
                                 : map["wind"]["deg"] > 22.5 && map["wind"]["deg"] < 67.5 ? "СВ"
@@ -131,7 +131,7 @@ currentWeatherSearchCard(BuildContext context, Map<String, dynamic> map, bool is
                                 : map["wind"]["deg"] > 202.5 && map["wind"]["deg"] < 247.5 ? "ЮЗ"
                                 : map["wind"]["deg"] > 247.5 && map["wind"]["deg"] < 292.5 ? "З"
                                 : "СЗ"} | ${map["wind"]["speed"].round() * 3.6} км/ч', 14),
-                            clickableGreyTextView(context, '${map["main"]["temp_max"].round()}/${map["main"]["temp_min"].round()}°C', 14),
+                            greyTextView(context, '${map["main"]["temp_max"].round()}/${map["main"]["temp_min"].round()}°C', 14),
                           ],
                         )
                     ),
@@ -148,21 +148,23 @@ currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i
 
   deleteFromFavorites(String id) async {
     print("!!!!delete from favorites in card");
-    print("!!!!ID $i");
+    print("!!!!ID $id");
     SharedPreferences getDataPrefs = await SharedPreferences.getInstance();
-    if (citiesID.contains("$id,")) {
-      citiesID = citiesID.replaceAll("$id,", "");
+    if (citiesID.contains(",$id")) {
+      citiesID = citiesID.replaceAll(",$id", "");
       getDataPrefs.setString('favorites', citiesID);
     } else {
-      citiesID = null;
+      citiesID = citiesID.replaceAll("$id", "");
+      if(citiesID == "") citiesID = null;
       getDataPrefs.setString('favorites', citiesID);
     }
     print("!!!!citiesID $citiesID");
     function();
   }
 
-  press(String i){
-    deleteFromFavorites(i);
+  press(String id){
+    print("????????????press id $id");
+    deleteFromFavorites(id);
   }
 
   return Container(
@@ -233,7 +235,7 @@ currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            clickableGreyTextView(context, 'Влажность ${map["list"][i]["main"]["humidity"].round()}% | '
+                            greyTextView(context, 'Влажность ${map["list"][i]["main"]["humidity"].round()}% | '
                                 '${map["list"][i]["wind"]["deg"] == null ? "?"
                                 : map["list"][i]["wind"]["deg"] > 337.5 || map["list"][i]["wind"]["deg"] < 22.5 ? "С"
                                 : map["list"][i]["wind"]["deg"] > 22.5 && map["list"][i]["wind"]["deg"] < 67.5 ? "СВ"
@@ -243,7 +245,7 @@ currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i
                                 : map["list"][i]["wind"]["deg"] > 202.5 && map["list"][i]["wind"]["deg"] < 247.5 ? "ЮЗ"
                                 : map["list"][i]["wind"]["deg"] > 247.5 && map["list"][i]["wind"]["deg"] < 292.5 ? "З"
                                 : "СЗ"} | ${map["list"][i]["wind"]["speed"].round() * 3.6} км/ч', 14),
-                            clickableGreyTextView(context, '${map["list"][i]["main"]["temp_max"].round()}/${map["list"][i]["main"]["temp_min"].round()}°C', 14),
+                            greyTextView(context, '${map["list"][i]["main"]["temp_max"].round()}/${map["list"][i]["main"]["temp_min"].round()}°C', 14),
                           ],
                         )
                     ),
