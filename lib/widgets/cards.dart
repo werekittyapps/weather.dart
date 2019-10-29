@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:weather/utils/utils.dart';
 import 'package:weather/widgets/images.dart';
 import 'package:weather/widgets/texts.dart';
+import 'package:flutter_sparkline/flutter_sparkline.dart';
 
 errorCard(BuildContext context, bool curWeatherCallError) {
   return Container(
@@ -241,35 +242,67 @@ currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i
   );
 }
 
-//weatherForecast(Map<String, dynamic> map){
 weatherForecast(List<dynamic> first, List<dynamic> second, List<dynamic> third,
     List<dynamic> forth, List<dynamic> fifth){
+  List<double> dataHigh = [];
+  dataHigh.add(first[4].toDouble());
+  dataHigh.add(second[4].toDouble());
+  dataHigh.add(third[4].toDouble());
+  dataHigh.add(forth[4].toDouble());
+  dataHigh.add(fifth[4].toDouble());
+  List<double> dataLow = [];
+  dataLow.add(first[5].toDouble());
+  dataLow.add(second[5].toDouble());
+  dataLow.add(third[5].toDouble());
+  dataLow.add(forth[5].toDouble());
+  dataLow.add(fifth[5].toDouble());
 
   return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: Container(
-          child: Container (
-            // Белая карточка
-            color: Colors.white,
-            child: Row (
-            mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                forecastColumn(first),
-                forecastColumn(second),
-                forecastColumn(third),
-                forecastColumn(forth),
-                forecastColumn(fifth)
-              ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Container(
+            child: Container (
+              // Белая карточка
+                height: 520,
+                color: Colors.white,
+                child: Column(
+                  children: <Widget>[
+                    Row (
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        forecastHighColumn(first),
+                        forecastHighColumn(second),
+                        forecastHighColumn(third),
+                        forecastHighColumn(forth),
+                        forecastHighColumn(fifth),
+                      ],
+                    ),
+                    Container(padding: EdgeInsets.fromLTRB(20, 0, 20, 0), height: 70, width: 360, child: Sparkline(data: dataHigh, lineColor: Colors.grey[400],
+                      lineWidth: 1, pointsMode: PointsMode.all, pointSize: 3, pointColor: Colors.grey[800],)),
+                    Container(padding: EdgeInsets.fromLTRB(20, 0, 20, 0), height: 70, width: 360,child: Sparkline(data: dataLow, lineColor: Colors.grey[400],
+                      lineWidth: 1, pointsMode: PointsMode.all, pointSize: 3, pointColor: Colors.grey[800],)),
+                    Row (
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        forecastLowColumn(first),
+                        forecastLowColumn(second),
+                        forecastLowColumn(third),
+                        forecastLowColumn(forth),
+                        forecastLowColumn(fifth),
+                      ],
+                    )
+                  ],
+                )
             )
-          )
+        ),
       )
   );
 }
 
-//forecastColumn(Map<String, dynamic> map, int Index){
-forecastColumn(List<dynamic> list){
+forecastHighColumn(List<dynamic> list){
   return Container(
-      height: 520,
+      height: 200,
       width: 80,
       child: Row(
         children: <Widget>[
@@ -297,11 +330,30 @@ forecastColumn(List<dynamic> list){
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.fromLTRB(0, 0, 0, 90),
+                  padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
                   child: greyTextViewForForecast("${list[4]}°C", 28),
                 ),
+              ],
+            ),
+          )
+        ],
+      )
+  );
+}
+
+forecastLowColumn(List<dynamic> list){
+  return Container(
+      height: 180,
+      width: 80,
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child:
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
                 Container(
-                  padding: EdgeInsets.fromLTRB(0, 90, 0, 0),
+                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                   child: greyTextViewForForecast("${list[5]}°C", 28),
                 ),
                 Container(
@@ -322,4 +374,5 @@ forecastColumn(List<dynamic> list){
       )
   );
 }
+
 
