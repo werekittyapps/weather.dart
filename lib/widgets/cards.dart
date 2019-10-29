@@ -167,7 +167,7 @@ currentWeatherSearchCard(BuildContext context, Map<String, dynamic> map) {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             clickableGreyTextView(context, 'Влажность ${map["main"]["humidity"].round()}% | '
-                                '${map["wind"]["deg"] == null ? " "
+                                '${map["wind"]["deg"] == null ? "?"
                                 : map["wind"]["deg"] > 337.5 || map["wind"]["deg"] < 22.5 ? "С"
                                 : map["wind"]["deg"] > 22.5 && map["wind"]["deg"] < 67.5 ? "СВ"
                                 : map["wind"]["deg"] > 67.5 && map["wind"]["deg"] < 112.5 ? "В"
@@ -201,10 +201,11 @@ currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i
                 Expanded(
                   child: Column(
                     children:[
+                      SizedBox(height: 48),
                       // Верхняя часть: Город, страна, иконка и градусы
                       // Нижняя часть: дополнительные фичи
                       Container(
-                        padding: EdgeInsets.fromLTRB(20, 20, 10, 20),
+                        padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -255,7 +256,8 @@ currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               clickableGreyTextView(context, 'Влажность ${map["list"][i]["main"]["humidity"].round()}% | '
-                                  '${map["list"][i]["wind"]["deg"] > 337.5 || map["list"][i]["wind"]["deg"] < 22.5 ? "С"
+                                  '${map["list"][i]["wind"]["deg"] == null ? "?"
+                                  : map["list"][i]["wind"]["deg"] > 337.5 || map["list"][i]["wind"]["deg"] < 22.5 ? "С"
                                   : map["list"][i]["wind"]["deg"] > 22.5 && map["list"][i]["wind"]["deg"] < 67.5 ? "СВ"
                                   : map["list"][i]["wind"]["deg"] > 67.5 && map["list"][i]["wind"]["deg"] < 112.5 ? "В"
                                   : map["list"][i]["wind"]["deg"] > 112.5 && map["list"][i]["wind"]["deg"] < 157.5 ? "ЮВ"
@@ -346,7 +348,8 @@ currentWeatherSearchCardWithBtn(BuildContext context, Map<String, dynamic> map, 
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             clickableGreyTextView(context, 'Влажность ${map["main"]["humidity"].round()}% | '
-                                '${map["wind"]["deg"] > 337.5 || map["wind"]["deg"] < 22.5 ? "С"
+                                '${map["wind"]["deg"] == null ? "?"
+                                : map["wind"]["deg"] > 337.5 || map["wind"]["deg"] < 22.5 ? "С"
                                 : map["wind"]["deg"] > 22.5 && map["wind"]["deg"] < 67.5 ? "СВ"
                                 : map["wind"]["deg"] > 67.5 && map["wind"]["deg"] < 112.5 ? "В"
                                 : map["wind"]["deg"] > 112.5 && map["wind"]["deg"] < 157.5 ? "ЮВ"
@@ -367,23 +370,21 @@ currentWeatherSearchCardWithBtn(BuildContext context, Map<String, dynamic> map, 
   );
 }
 
-currentWeatherSearchCardWithDeleteBtn(BuildContext context, Map<String, dynamic> map, int i, String citiesID) {
+currentWeatherSearchCardWithDeleteBtn(BuildContext context, Map<String, dynamic> map, int i, String citiesID, Function function) {
 
   deleteFromFavorites(String id) async {
-    print("delete from favorites");
+    print("!!!!delete from favorites in card");
+    print("!!!!ID $i");
     SharedPreferences getDataPrefs = await SharedPreferences.getInstance();
-    print("shared prefs");
     if (citiesID.contains("$id,")) {
       citiesID = citiesID.replaceAll("$id,", "");
       getDataPrefs.setString('favorites', citiesID);
     } else {
-      print("else");
       citiesID = null;
-      print("citiesID: is like nothing");
       getDataPrefs.setString('favorites', citiesID);
-      print(citiesID);
-      print("prefs setted");
     }
+    print("!!!!citiesID $citiesID");
+    function();
   }
 
   press(String i){
@@ -405,7 +406,7 @@ currentWeatherSearchCardWithDeleteBtn(BuildContext context, Map<String, dynamic>
                       alignment: Alignment(1.0, -1.0),
                       child: IconButton(
                         icon: Icon(Icons.remove_circle_outline),
-                        onPressed: (){press(i.toString());},),
+                        onPressed: (){press(map["list"][i]["id"].toString());},),
                     ),
                     Container(
                       padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
@@ -459,7 +460,8 @@ currentWeatherSearchCardWithDeleteBtn(BuildContext context, Map<String, dynamic>
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             clickableGreyTextView(context, 'Влажность ${map["list"][i]["main"]["humidity"].round()}% | '
-                                '${map["list"][i]["wind"]["deg"] > 337.5 || map["list"][i]["wind"]["deg"] < 22.5 ? "С"
+                                '${map["list"][i]["wind"]["deg"] == null ? "?"
+                                : map["list"][i]["wind"]["deg"] > 337.5 || map["list"][i]["wind"]["deg"] < 22.5 ? "С"
                                 : map["list"][i]["wind"]["deg"] > 22.5 && map["list"][i]["wind"]["deg"] < 67.5 ? "СВ"
                                 : map["list"][i]["wind"]["deg"] > 67.5 && map["list"][i]["wind"]["deg"] < 112.5 ? "В"
                                 : map["list"][i]["wind"]["deg"] > 112.5 && map["list"][i]["wind"]["deg"] < 157.5 ? "ЮВ"
