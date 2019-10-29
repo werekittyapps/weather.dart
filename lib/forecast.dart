@@ -235,7 +235,7 @@ class ForecastBodyState extends State<ForecastBody> {
               child: isLoading ?
               Container(alignment: Alignment(0.0,-1.0), padding: EdgeInsets.fromLTRB(0, 55, 0, 0), child: CircularProgressIndicator())
                   : forecastError? Container(height: 170, padding: EdgeInsets.fromLTRB(20, 10, 20, 0), child: errorCard(context, false))
-                  : weatherForecast(firstDayData, secondDayData, thirdDayData, forthDayData, fifthDayData),
+                  : Container(alignment: Alignment(0.0, -1.0), child: weatherForecast(firstDayData, secondDayData, thirdDayData, forthDayData, fifthDayData),),
             ),
             new Positioned(
               top: 0.0, left: 0.0, right: 0.0,

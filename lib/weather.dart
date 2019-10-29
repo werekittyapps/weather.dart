@@ -234,6 +234,7 @@ class WeatherBodyState extends State<WeatherBody> {
   void initState() {
     getCached();
     //deleteCache();
+    //getLocation();
 
     super.initState();
   }
