@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:weather/forecast.dart';
+import 'package:weather/utils/utils.dart';
 import 'package:weather/widgets/cards.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -152,11 +153,11 @@ class WeatherBodyState extends State<WeatherBody> {
     if(!noData){
       noFavorites = false;
       citiesID = favorsID;
+      citiesID = dealWithCommas(citiesID);
       citiesID = dealWithDuplicated(citiesID);
       prefs.setString('favorites', citiesID);
       print("citiesID: $citiesID");
       weatherCall(citiesID, inSearchFlag);
-      //currentWeatherForFavorites(citiesID);
     }
     print(noData);
     setState(() {
@@ -208,20 +209,6 @@ class WeatherBodyState extends State<WeatherBody> {
       });
     }
   }
-
-  deleteFromFavorites(String id) async {
-    print("delete from favorites");
-    SharedPreferences getDataPrefs = await SharedPreferences.getInstance();
-    if (citiesID.contains(",$id")) {
-      citiesID = citiesID.replaceAll(",$id", "");
-      getDataPrefs.setString('favorites', citiesID);
-    } else {
-      citiesID = citiesID.replaceAll("$id", "");
-      if(citiesID == "") citiesID = null;
-      getDataPrefs.setString('favorites', citiesID);
-      print(citiesID);
-    }
-  }
   
   isInFavorites(String id){
     if (citiesID != null && citiesID.contains("$id")) return true;
@@ -230,7 +217,7 @@ class WeatherBodyState extends State<WeatherBody> {
 
   pressButton() {
     setState(() {
-      if(isInFavorites(_currentWeather["id"].toString())) deleteFromFavorites(_currentWeather["id"].toString());
+      if(isInFavorites(_currentWeather["id"].toString())) deleteFromFavoritesUtils(_currentWeather["id"].toString(), citiesID, getCached);
       else addToFavorites(_currentWeather["id"].toString());
       isInFavorites(_currentWeather["id"].toString());
     });
@@ -243,41 +230,11 @@ class WeatherBodyState extends State<WeatherBody> {
     if (citiesID != ""){
       citiesID += ",$id";
       getDataPrefs.setString('favorites', citiesID);
+      //getDataPrefs.setString('favorites', null);
     } else {
       citiesID = "$id";
       getDataPrefs.setString('favorites', citiesID);
     }
-  }
-
-  String dealWithDuplicated(String id){
-    print("deal with dublicated");
-    var list = [];
-    var ids = id;
-    if (id != ""){
-      list = id.split(",").toList();
-      if(list.length != 1 ){
-        ids = "";
-        print(ids);
-        for(int i = 0; i < list.length - 1; i++) {
-          for (int j = i + 1; j < list.length; j++) {
-            if (list[i] == list[j]) {
-              list.removeAt(j);
-              j = j - 1;
-            }
-          }
-        }
-      }
-    }
-    if(id != "" && list != null && list.length != 1){
-      for(int i = 0; i < list.length; i++) {
-        if(list.length - i > 1){
-          ids += "${list[i]},";
-        } else {
-          ids += list[i];
-        }
-      }
-    }
-    return ids;
   }
 
   deleteCache() async{
@@ -316,7 +273,7 @@ class WeatherBodyState extends State<WeatherBody> {
                               itemBuilder: (context, i){
                                 return new ListTile(
                                   title: Container(child: curWeatherCallError? errorCard(context, curWeatherCallError) : currentWeatherSearchCard(context, _currentWeather, isInFavorites(_currentWeather["id"].toString()), pressButton),),
-                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeather["id"].toString(), city: _currentWeather["name"].toString()))),
+                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeather["id"].toString(), city: _currentWeather["name"].toString(), caching: false,))),
                                 //)
                                 );
                               }),
@@ -341,7 +298,7 @@ class WeatherBodyState extends State<WeatherBody> {
                               itemBuilder: (context, i){
                                 return new ListTile(
                                   title: Container(child: curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag)),
-                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeatherForFavorites["list"][i]["id"].toString(), city: _currentWeatherForFavorites["list"][i]["name"].toString()))),
+                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeatherForFavorites["list"][i]["id"].toString(), city: _currentWeatherForFavorites["list"][i]["name"].toString(), caching: true,))),
                                   onLongPress: () => startEditing(),
                                 );
                               }),

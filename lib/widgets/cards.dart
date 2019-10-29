@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:weather/utils/utils.dart';
 import 'package:weather/widgets/images.dart';
 import 'package:weather/widgets/texts.dart';
 
@@ -146,25 +146,8 @@ currentWeatherSearchCard(BuildContext context, Map<String, dynamic> map, bool is
 
 currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i, String citiesID, Function function, bool editFlag) {
 
-  deleteFromFavorites(String id) async {
-    print("!!!!delete from favorites in card");
-    print("!!!!ID $id");
-    SharedPreferences getDataPrefs = await SharedPreferences.getInstance();
-    if (citiesID.contains(",$id")) {
-      citiesID = citiesID.replaceAll(",$id", "");
-      getDataPrefs.setString('favorites', citiesID);
-    } else {
-      citiesID = citiesID.replaceAll("$id", "");
-      if(citiesID == "") citiesID = null;
-      getDataPrefs.setString('favorites', citiesID);
-    }
-    print("!!!!citiesID $citiesID");
-    function();
-  }
-
   press(String id){
-    print("????????????press id $id");
-    deleteFromFavorites(id);
+    deleteFromFavoritesUtils(id, citiesID, function);
   }
 
   return Container(

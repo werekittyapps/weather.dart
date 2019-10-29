@@ -6,17 +6,19 @@ import 'package:dio/dio.dart';
 class ForecastBody extends StatefulWidget {
   final String id;
   final String city;
-  ForecastBody({this.id, this.city});
+  final bool caching;
+  ForecastBody({this.id, this.city, this.caching});
 
   @override
-  createState() => new ForecastBodyState(id, city);
+  createState() => new ForecastBodyState(id, city, caching);
 }
 
 
 class ForecastBodyState extends State<ForecastBody> {
   final String id;
   final String city;
-  ForecastBodyState(this.id, this.city);
+  final bool caching;
+  ForecastBodyState(this.id, this.city, this.caching);
 
   var _forecast; // for forecast
   bool forecastError = false;
@@ -44,11 +46,16 @@ class ForecastBodyState extends State<ForecastBody> {
       Response response = await Dio().get("https://api.openweathermap.org/data/2.5/forecast?id=$id&units=metric&appid=7fe8b89a7579b408a6997d47eb97164c");
       debugPrint("forecast response ${response.statusCode}");
       if(response.statusCode == 200) {
+        //if (caching){
+        //  print("caching forecast");
+        //  SharedPreferences prefs = await SharedPreferences.getInstance();
+        //  prefs.setString('forecastFor$id', response.data);
+        //}
         setState(() {
           _forecast = response.data;
           forecastError = false;
           forecastHandler();
-          //isLoading = false;
+
         });
       }
       if(response.statusCode == 400) {
