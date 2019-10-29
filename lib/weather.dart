@@ -330,7 +330,7 @@ class WeatherBodyState extends State<WeatherBody> {
                               itemCount: 1,
                               itemBuilder: (context, i){
                                 return new ListTile(
-                                  title: Container(child: curWeatherCallError? errorCard(context) : currentWeatherSearchCardWithBtn(context, _currentWeather, isInFavorites(_currentWeather["id"].toString()), pressButton),),
+                                  title: Container(child: curWeatherCallError? errorCard(context, curWeatherCallError) : currentWeatherSearchCard(context, _currentWeather, isInFavorites(_currentWeather["id"].toString()), pressButton),),
                                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeather["id"].toString(), city: _currentWeather["name"].toString()))),
                                 //)
                                 );
@@ -355,7 +355,7 @@ class WeatherBodyState extends State<WeatherBody> {
                               itemCount: _currentWeatherForFavorites["cnt"],
                               itemBuilder: (context, i){
                                 return new ListTile(
-                                  title: Container(child: curWeatherCallErrorForFavorites? errorCard(context): editFlag ? currentWeatherSearchCardWithDeleteBtn(context,_currentWeatherForFavorites, i, citiesID, getCached) : currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i)),
+                                  title: Container(child: curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag)),
                                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeatherForFavorites["list"][i]["id"].toString(), city: _currentWeatherForFavorites["list"][i]["name"].toString()))),
                                   onLongPress: () => startEditing(),
                                 );
