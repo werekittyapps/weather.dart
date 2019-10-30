@@ -8,6 +8,9 @@ import 'package:weather/widgets/cards.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:toast/toast.dart';
+import 'package:data_connection_checker/data_connection_checker.dart';
+
 class WeatherBody extends StatefulWidget {
 
 @override
@@ -23,8 +26,6 @@ class WeatherBodyState extends State<WeatherBody> {
   // Geolocation
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
   Position _currentPosition;
-  String _currentAddress;
-  var _curAddress = [];
   var _currentGeoWeather;
 
   // For search bar
@@ -43,6 +44,7 @@ class WeatherBodyState extends State<WeatherBody> {
   bool curGeoWeatherCallError = false;
 
   weatherCall(String cities, bool inSearchFlag, double lat, double lon, bool callingGeo) async {
+    checkInternet();
     print("wheater call");
     setState(() {
       isLoading = true;
@@ -66,7 +68,6 @@ class WeatherBodyState extends State<WeatherBody> {
           prefs.setString('geoWeatherCache', json.encode(data));
           setState(() {
             _currentGeoWeather = geoResponse.data;
-            print(_currentGeoWeather);
             curGeoWeatherCallError = false;
             isLoading = false;
           });
@@ -205,12 +206,14 @@ class WeatherBodyState extends State<WeatherBody> {
               },
             );
       } else {
-        this._searchIcon = new Icon(Icons.add);
-        this._appBarTitle = new Text('Weather');
-        inSearchFlag = false;
-        searchFlag = false;
-        _filter.clear();
-        getCached();
+        if(!editFlag){
+          this._searchIcon = new Icon(Icons.add);
+          this._appBarTitle = new Text('Weather');
+          inSearchFlag = false;
+          searchFlag = false;
+          _filter.clear();
+          getCached();
+        }
       }
     });
   }
@@ -280,28 +283,20 @@ class WeatherBodyState extends State<WeatherBody> {
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
         .then((Position position) {
         _currentPosition = position;
-        getAddressFromLatLng();
-        print("LAT: ${_currentPosition.latitude}, LNG: ${_currentPosition.longitude}");
         weatherCall(citiesID, inSearchFlag, _currentPosition.latitude, _currentPosition.longitude, true);
     }).catchError((e) {
       print(e);
     });
   }
 
-  getAddressFromLatLng() async {
-    try {
-      List<Placemark> p = await geolocator.placemarkFromCoordinates(
-          _currentPosition.latitude, _currentPosition.longitude);
-      Placemark place = p[0];
-      _currentAddress = "${place.locality},${place.country}";
-      _curAddress.add(place.locality);
-      _curAddress.add(place.country);
-      print("Address: $_currentAddress");
-    } catch (e) {
-      print(e);
+  checkInternet() async{
+    bool result = await DataConnectionChecker().hasConnection;
+    if(result == true) {
+      print('We have connection');
+    } else {
+      Toast.show("Не удалось подключиться к сети", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
     }
   }
-
 
   @override
   void initState() {

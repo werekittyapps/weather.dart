@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather/widgets/cards.dart';
 import 'package:dio/dio.dart';
+import 'package:toast/toast.dart';
+import 'package:data_connection_checker/data_connection_checker.dart';
 
 class ForecastBody extends StatefulWidget {
   final String id;
@@ -39,6 +41,7 @@ class ForecastBodyState extends State<ForecastBody> {
   List<dynamic> fifthDayData = [];
 
   weatherForecastCall(String id) async {
+    checkInternet();
     setState(() {
       isLoading = true;
     });
@@ -217,6 +220,15 @@ class ForecastBodyState extends State<ForecastBody> {
     if (index == 5) return "Пт";
     if (index == 6) return "Сб";
     return "Вс";
+  }
+
+  checkInternet() async{
+    bool result = await DataConnectionChecker().hasConnection;
+    if(result == true) {
+      print('We have connection');
+    } else {
+      Toast.show("Не удалось подключиться к сети", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
+    }
   }
 
   void initState() {
