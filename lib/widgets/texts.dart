@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 greyTextView (BuildContext context, String text, double textSize) {
   return RichText(
@@ -16,6 +17,17 @@ greyTextView (BuildContext context, String text, double textSize) {
           )
         ]
     ),
+  );
+}
+
+greyAutoSizedTextView (BuildContext context, String text, double textSize) {
+  return AutoSizeText.rich(
+    TextSpan(text: text),
+    style: TextStyle(fontSize: textSize,
+        color: Colors.grey[800]),
+    minFontSize: textSize,
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis
   );
 }
 

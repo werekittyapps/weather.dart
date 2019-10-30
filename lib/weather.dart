@@ -7,6 +7,7 @@ import 'package:weather/utils/utils.dart';
 import 'package:weather/widgets/cards.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
 class WeatherBody extends StatefulWidget {
 
 @override
@@ -18,6 +19,13 @@ class WeatherBodyState extends State<WeatherBody> {
   var _currentWeatherForFavorites; // for life
   String citiesID = "";
   int cityPosition;
+
+  // Geolocation
+  final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+  Position _currentPosition;
+  String _currentAddress;
+  var _curAddress = [];
+  var _currentGeoWeather;
 
   // For search bar
   Widget _appBarTitle = new Text( 'Weather' );
@@ -32,14 +40,19 @@ class WeatherBodyState extends State<WeatherBody> {
   bool editFlag = false;
   bool curWeatherCallError = false;
   bool curWeatherCallErrorForFavorites = false;
+  bool curGeoWeatherCallError = false;
 
-  weatherCall(String cities, bool inSearchFlag) async {
+  weatherCall(String cities, bool inSearchFlag, double lat, double lon, bool callingGeo) async {
     print("wheater call");
     setState(() {
       isLoading = true;
     });
     try {
       Response response;
+      Response geoResponse;
+      if(callingGeo) {
+        geoResponse = await Dio().get("https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid=7fe8b89a7579b408a6997d47eb97164c");
+      }
       if(inSearchFlag){
         response = await Dio().get("https://api.openweathermap.org/data/2.5/weather?q=$cities&appid=7fe8b89a7579b408a6997d47eb97164c&units=metric");
       } else {
@@ -47,6 +60,17 @@ class WeatherBodyState extends State<WeatherBody> {
       }
       debugPrint("response ${response.statusCode}");
       if(response.statusCode == 200) {
+        if(callingGeo) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          var data = geoResponse.data;
+          prefs.setString('geoWeatherCache', json.encode(data));
+          setState(() {
+            _currentGeoWeather = geoResponse.data;
+            print(_currentGeoWeather);
+            curGeoWeatherCallError = false;
+            isLoading = false;
+          });
+        }
         if(inSearchFlag) {
           setState(() {
             _currentWeather = response.data;
@@ -74,6 +98,9 @@ class WeatherBodyState extends State<WeatherBody> {
         // 500 - "Internal Server Error: ошибка соединения с сервером"
         // 503 - "Сервер недоступен"
         setState(() {
+          if(callingGeo) {
+            getCachedGeoWeather();
+          }
           if(inSearchFlag) {
             curWeatherCallError = true;
             searchFlag = true;
@@ -84,7 +111,11 @@ class WeatherBodyState extends State<WeatherBody> {
         });
       }
     } catch (e) {
+      print(e);
       setState(() {
+        if(callingGeo){
+          getCachedGeoWeather();
+        }
         if(inSearchFlag) {
           curWeatherCallError = true;
           searchFlag = true;
@@ -114,8 +145,27 @@ class WeatherBodyState extends State<WeatherBody> {
     });
   }
 
+  getCachedGeoWeather() async{
+    var noData = false;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var cache = (prefs.getString('geoWeatherCache') ?? {
+      curWeatherCallError = true,
+      print("No cached geo weather"),
+      noData = true,
+    });
+    if(!noData){
+      setState(() {
+        _currentGeoWeather = json.decode(cache);
+      });
+    }
+    setState(() {
+      curWeatherCallError = curWeatherCallError;
+    });
+  }
+
   getCached() async{
     print("get cached");
+    getLocation();
     var noData = false;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var favorsID = (prefs.getString('favorites') ?? {
@@ -131,7 +181,7 @@ class WeatherBodyState extends State<WeatherBody> {
       citiesID = dealWithDuplicated(citiesID);
       prefs.setString('favorites', citiesID);
       print("citiesID: $citiesID");
-      weatherCall(citiesID, inSearchFlag);
+      weatherCall(citiesID, inSearchFlag, 0.0, 0.0, false); //
     }
     print(noData);
     setState(() {
@@ -151,7 +201,7 @@ class WeatherBodyState extends State<WeatherBody> {
               hintText: 'Search...',),
           onSubmitted: (value) {
               String city = value.trim().replaceAll(" ", "%20").replaceAll("\n", "");
-              if(city.isNotEmpty) weatherCall(city, inSearchFlag);
+              if(city.isNotEmpty) weatherCall(city, inSearchFlag, 0.0, 0.0, false);
               },
             );
       } else {
@@ -199,11 +249,6 @@ class WeatherBodyState extends State<WeatherBody> {
     return isIn;
   }
 
-  //isInFavorites(String id){
-  //  if (citiesID != null && citiesID.contains("$id")) return true;
-  //  return false;
-  //}
-
   pressButton() {
     setState(() {
       if(isInFavorites(_currentWeather["id"].toString())) deleteFromFavoritesUtils(_currentWeather["id"].toString(), citiesID, getCached, cityPosition);
@@ -230,11 +275,38 @@ class WeatherBodyState extends State<WeatherBody> {
     getDataPrefs.clear();
   }
 
+  getLocation(){
+    geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .then((Position position) {
+        _currentPosition = position;
+        getAddressFromLatLng();
+        print("LAT: ${_currentPosition.latitude}, LNG: ${_currentPosition.longitude}");
+        weatherCall(citiesID, inSearchFlag, _currentPosition.latitude, _currentPosition.longitude, true);
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
+  getAddressFromLatLng() async {
+    try {
+      List<Placemark> p = await geolocator.placemarkFromCoordinates(
+          _currentPosition.latitude, _currentPosition.longitude);
+      Placemark place = p[0];
+      _currentAddress = "${place.locality},${place.country}";
+      _curAddress.add(place.locality);
+      _curAddress.add(place.country);
+      print("Address: $_currentAddress");
+    } catch (e) {
+      print(e);
+    }
+  }
+
+
   @override
   void initState() {
     getCached();
     //deleteCache();
-    //getLocation();
 
     super.initState();
   }
@@ -274,18 +346,29 @@ class WeatherBodyState extends State<WeatherBody> {
                         child: Container (
                           padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
                           child:
-                          noFavorites ?
+                          noFavorites && _currentGeoWeather == null ?
                           Container() // Если нет избранных карт показываем пустой контейнер
                               :
                           isLoading ?
                           Container(alignment: Alignment(0.0,-1.0), padding: EdgeInsets.fromLTRB(0, 55, 0, 0), child: CircularProgressIndicator(),)
                               :
                           ListView.builder(
-                              itemCount: _currentWeatherForFavorites["cnt"],
+                              itemCount: noFavorites && _currentGeoWeather != null ? 1 : _currentGeoWeather == null ? _currentWeatherForFavorites["cnt"] : _currentWeatherForFavorites["cnt"] + 1,
                               itemBuilder: (context, i){
                                 return new ListTile(
-                                  title: Container(child: curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag)),
-                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeatherForFavorites["list"][i]["id"].toString(), city: _currentWeatherForFavorites["list"][i]["name"].toString(), caching: true,))),
+                                  title: Container(
+                                      child:
+                                      _currentGeoWeather == null ?
+                                      curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag, false)
+                                          : curGeoWeatherCallError && i == 0 ? errorCard(context, curWeatherCallError)
+                                          : curGeoWeatherCallError && i != 0 ? curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i - 1, citiesID, getCached,  editFlag, false)
+                                          : !curGeoWeatherCallError && i == 0 ? currentWeatherFavoriteCard(context,_currentGeoWeather, 0, citiesID, getCached,  false, true)
+                                          : !curGeoWeatherCallError && i != 0 ? curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i - 1, citiesID, getCached,  editFlag, false)
+                                          : Container()
+                                  ),
+                                  onTap: () => _currentGeoWeather != null && i == 0 ? null
+                                      : curWeatherCallErrorForFavorites ? null
+                                      : Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeatherForFavorites["list"][i -1]["id"].toString(), city: _currentWeatherForFavorites["list"][i-1]["name"].toString(), caching: true,))),
                                   onLongPress: () => startEditing(),
                                 );
                               }),

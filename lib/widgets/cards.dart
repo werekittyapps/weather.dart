@@ -84,7 +84,7 @@ currentWeatherSearchCard(BuildContext context, Map<String, dynamic> map, bool is
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                greyTextView(context, map["name"], 22),
+                              Container(width: 160, child: greyAutoSizedTextView(context, map["name"], 22)),
                                 greyTextView(context, map["sys"]["country"], 12),
                               ],
                             ),
@@ -96,7 +96,7 @@ currentWeatherSearchCard(BuildContext context, Map<String, dynamic> map, bool is
                                 children: <Widget>[
                                   Container(
                                     alignment: Alignment(1.0, -1.0),
-                                    padding: EdgeInsets.fromLTRB(20, 5, 5, 5),
+                                    padding: EdgeInsets.fromLTRB(0, 5, 5, 5),
                                     child: cachedImageLoader(map["weather"][0]["icon"]),
                                   ),
                                   Container(
@@ -145,7 +145,7 @@ currentWeatherSearchCard(BuildContext context, Map<String, dynamic> map, bool is
   );
 }
 
-currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i, String citiesID, Function function, bool editFlag) {
+currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i, String citiesID, Function function, bool editFlag, bool isItGeoCard) {
 
   press(String id){
     deleteFromFavoritesUtils(id, citiesID, function, i);
@@ -181,8 +181,9 @@ currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                greyTextView(context, map["list"][i]["name"], 22),
-                                greyTextView(context, map["list"][i]["sys"]["country"], 12),
+                                isItGeoCard ? Row(children: <Widget>[Container(width: 160, child: greyAutoSizedTextView(context, map["name"], 22),), Icon(Icons.place, color: Colors.grey[800],)],)
+                                    : Container(width: 160, child: greyAutoSizedTextView(context, map["list"][i]["name"], 22)),
+                                isItGeoCard ? map["sys"] == null ? greyTextView(context, "empty", 12) : greyTextView(context, map["sys"]["country"], 12) : greyTextView(context, map["list"][i]["sys"]["country"], 12),
                               ],
                             ),
                           ),
@@ -193,13 +194,13 @@ currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i
                                 children: <Widget>[
                                   Container(
                                     alignment: Alignment(1.0, -1.0),
-                                    padding: EdgeInsets.fromLTRB(20, 5, 5, 5),
-                                    child: cachedImageLoader(map["list"][i]["weather"][0]["icon"]),
+                                    padding: EdgeInsets.fromLTRB(0, 5, 5, 5),
+                                    child: isItGeoCard ? cachedImageLoader(map["weather"][0]["icon"]) : cachedImageLoader(map["list"][i]["weather"][0]["icon"]),
                                   ),
                                   Container(
                                     alignment: Alignment(1.0, -1.0),
                                     padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-                                    child: greyTextView(context, '${map["list"][i]["main"]["temp"].round()}°C', 24),
+                                    child: isItGeoCard ? greyTextView(context, '${map["main"]["temp"].round()}°C', 24) : greyTextView(context, '${map["list"][i]["main"]["temp"].round()}°C', 24),
                                   ),
                                 ],
                               ),
@@ -216,10 +217,28 @@ currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i
                     ),
                     Container(
                         padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                        child: Row(
+                        child: isItGeoCard ?
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            greyTextView(context, 'Влажность ${map["list"][i]["main"]["humidity"].round()}% | '
+                            greyTextView(context, 'Влажность ${map["main"]["humidity"].round()}% | '
+                                '${map["wind"]["deg"] == null ? "?"
+                                : map["wind"]["deg"] > 337.5 || map["wind"]["deg"] < 22.5 ? "С"
+                                : map["wind"]["deg"] > 22.5 && map["wind"]["deg"] < 67.5 ? "СВ"
+                                : map["wind"]["deg"] > 67.5 && map["wind"]["deg"] < 112.5 ? "В"
+                                : map["wind"]["deg"] > 112.5 && map["wind"]["deg"] < 157.5 ? "ЮВ"
+                                : map["wind"]["deg"] > 157.5 && map["wind"]["deg"] < 202.5 ? "Ю"
+                                : map["wind"]["deg"] > 202.5 && map["wind"]["deg"] < 247.5 ? "ЮЗ"
+                                : map["wind"]["deg"] > 247.5 && map["wind"]["deg"] < 292.5 ? "З"
+                                : "СЗ"} | ${map["wind"]["speed"].round() * 3.6} км/ч', 14),
+                            greyTextView(context, '${map["main"]["temp_max"].round()}/${map["main"]["temp_min"].round()}°C', 14),
+                          ],
+                        )
+                            :
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                             greyTextView(context, 'Влажность ${map["list"][i]["main"]["humidity"].round()}% | '
                                 '${map["list"][i]["wind"]["deg"] == null ? "?"
                                 : map["list"][i]["wind"]["deg"] > 337.5 || map["list"][i]["wind"]["deg"] < 22.5 ? "С"
                                 : map["list"][i]["wind"]["deg"] > 22.5 && map["list"][i]["wind"]["deg"] < 67.5 ? "СВ"
