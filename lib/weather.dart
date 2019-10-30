@@ -366,7 +366,7 @@ class WeatherBodyState extends State<WeatherBody> {
                                           : !curGeoWeatherCallError && i != 0 ? curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i - 1, citiesID, getCached,  editFlag, false)
                                           : Container()
                                   ),
-                                  onTap: () => _currentGeoWeather != null && i == 0 ? null
+                                  onTap: () => _currentGeoWeather != null && i == 0 ? Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentGeoWeather["id"].toString(), city: _currentGeoWeather["name"].toString(), caching: false,)))
                                       : curWeatherCallErrorForFavorites ? null
                                       : Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeatherForFavorites["list"][i -1]["id"].toString(), city: _currentWeatherForFavorites["list"][i-1]["name"].toString(), caching: true,))),
                                   onLongPress: () => startEditing(),
