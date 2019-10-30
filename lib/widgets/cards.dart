@@ -145,7 +145,7 @@ currentWeatherSearchCard(BuildContext context, Map<String, dynamic> map, bool is
   );
 }
 
-currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i, String citiesID, Function function, bool editFlag, bool isItGeoCard) {
+currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i, String citiesID, Function function, bool editFlag, bool isItGeoCard, bool isInFavorites, Function pressButton) {
 
   press(String id){
     deleteFromFavoritesUtils(id, citiesID, function, i);
@@ -167,7 +167,18 @@ currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i
                       child: IconButton(
                         icon: Icon(Icons.remove_circle_outline),
                         onPressed: (){press(map["list"][i]["id"].toString());},),
-                    ) : SizedBox(height: 48),
+                    ) : isItGeoCard ? Container(
+                          alignment: Alignment(-1.0, -1.0),
+                          child: Row(
+                            children: <Widget>[
+                              IconButton(
+                                icon: Icon(isInFavorites ? Icons.star : Icons.star_border),
+                                onPressed: (){pressButton();},),
+                              greyTextView(context, "Текущее местоположение", 14)
+                            ],
+                          )
+                    )
+                        : SizedBox(height: 48),
                     Container(
                       padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
                       child: Row(
@@ -384,6 +395,54 @@ forecastLowColumn(List<dynamic> list){
                       Container(padding: EdgeInsets.only(bottom: 10), child: greyTextViewForForecast(list[8].toString(), 14)),
                     ],
                   ),
+                ),
+                Divider(thickness: 1, height: 0, color: Colors.grey[400])
+              ],
+            ),
+          )
+        ],
+      )
+  );
+}
+
+forecastDayHigh(String temp){
+  return Container(
+      height: 40,
+      width: 80,
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child:
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Divider(thickness: 1, height: 0, color: Colors.grey[400]),
+                Container(
+                  child: greyTextViewForForecast("$temp°C", 18),
+                ),
+
+              ],
+            ),
+          )
+        ],
+      )
+  );
+}
+
+forecastDayLow(String time){
+  return Container(
+      height: 40,
+      width: 80,
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child:
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                  child: greyTextViewForForecast(time, 14),
                 ),
                 Divider(thickness: 1, height: 0, color: Colors.grey[400])
               ],

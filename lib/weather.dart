@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:weather/forecast.dart';
+import 'package:weather/forecasts.dart';
 import 'package:weather/utils/utils.dart';
 import 'package:weather/widgets/cards.dart';
 import 'package:dio/dio.dart';
@@ -252,11 +252,24 @@ class WeatherBodyState extends State<WeatherBody> {
     return isIn;
   }
 
-  pressButton() {
+  pressButtonSearch() {
     setState(() {
       if(isInFavorites(_currentWeather["id"].toString())) deleteFromFavoritesUtils(_currentWeather["id"].toString(), citiesID, getCached, cityPosition);
       else addToFavorites(_currentWeather["id"].toString());
       isInFavorites(_currentWeather["id"].toString());
+    });
+  }
+
+  pressButton() {
+    setState(() {
+      if(isInFavorites(_currentGeoWeather["id"].toString())) {
+        deleteFromFavoritesUtils(_currentGeoWeather["id"].toString(), citiesID, getCached, cityPosition);
+        getCached();
+      } else {
+        addToFavorites(_currentGeoWeather["id"].toString());
+        getCached();
+      }
+      isInFavorites(_currentGeoWeather["id"].toString());
     });
   }
 
@@ -329,8 +342,8 @@ class WeatherBodyState extends State<WeatherBody> {
                               itemCount: 1,
                               itemBuilder: (context, i){
                                 return new ListTile(
-                                  title: Container(child: curWeatherCallError? errorCard(context, curWeatherCallError) : currentWeatherSearchCard(context, _currentWeather, isInFavorites(_currentWeather["id"].toString()), pressButton),),
-                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeather["id"].toString(), city: _currentWeather["name"].toString(), caching: false,))),
+                                  title: Container(child: curWeatherCallError? errorCard(context, curWeatherCallError) : currentWeatherSearchCard(context, _currentWeather, isInFavorites(_currentWeather["id"].toString()), pressButtonSearch),),
+                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastsBody(id: _currentWeather["id"].toString(), city: _currentWeather["name"].toString(), caching: false,))),
                                 );
                               }),
                         ),
@@ -356,16 +369,16 @@ class WeatherBodyState extends State<WeatherBody> {
                                   title: Container(
                                       child:
                                       _currentGeoWeather == null ?
-                                      curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag, false)
+                                      curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag, false, null, null)
                                           : curGeoWeatherCallError && i == 0 ? errorCard(context, curWeatherCallError)
-                                          : curGeoWeatherCallError && i != 0 ? curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i - 1, citiesID, getCached,  editFlag, false)
-                                          : !curGeoWeatherCallError && i == 0 ? currentWeatherFavoriteCard(context,_currentGeoWeather, 0, citiesID, getCached,  false, true)
-                                          : !curGeoWeatherCallError && i != 0 ? curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i - 1, citiesID, getCached,  editFlag, false)
+                                          : curGeoWeatherCallError && i != 0 ? curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i - 1, citiesID, getCached,  editFlag, false, null, null)
+                                          : !curGeoWeatherCallError && i == 0 ? currentWeatherFavoriteCard(context,_currentGeoWeather, 0, citiesID, getCached,  false, true, isInFavorites(_currentGeoWeather["id"].toString()), pressButton)
+                                          : !curGeoWeatherCallError && i != 0 ? curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i - 1, citiesID, getCached,  editFlag, false, null, null)
                                           : Container()
                                   ),
-                                  onTap: () => _currentGeoWeather != null && i == 0 ? Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentGeoWeather["id"].toString(), city: _currentGeoWeather["name"].toString(), caching: false,)))
+                                  onTap: () => _currentGeoWeather != null && i == 0 ? Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastsBody(id: _currentGeoWeather["id"].toString(), city: _currentGeoWeather["name"].toString(), caching: false,)))
                                       : curWeatherCallErrorForFavorites ? null
-                                      : Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastBody(id: _currentWeatherForFavorites["list"][i -1]["id"].toString(), city: _currentWeatherForFavorites["list"][i-1]["name"].toString(), caching: true,))),
+                                      : Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastsBody(id: _currentWeatherForFavorites["list"][i -1]["id"].toString(), city: _currentWeatherForFavorites["list"][i-1]["name"].toString(), caching: true,))),
                                   onLongPress: () => startEditing(),
                                 );
                               }),

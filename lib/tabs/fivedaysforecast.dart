@@ -8,21 +8,25 @@ import 'package:dio/dio.dart';
 import 'package:toast/toast.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
 
-class ForecastBody extends StatefulWidget {
+class FiveDaysForecast extends StatefulWidget {
   final String id;
   final String city;
   final bool caching;
-  ForecastBody({this.id, this.city, this.caching});
+
+  const FiveDaysForecast({
+    Key key,
+    this.id, this.city, this.caching
+  }) : super(key: key);
 
   @override
-  createState() => new ForecastBodyState(id, city, caching);
+  FiveDaysForecastState createState() => FiveDaysForecastState(id, city, caching);
 }
 
-class ForecastBodyState extends State<ForecastBody> {
+class FiveDaysForecastState extends State<FiveDaysForecast> {
   final String id;
   final String city;
   final bool caching;
-  ForecastBodyState(this.id, this.city, this.caching);
+  FiveDaysForecastState(this.id, this.city, this.caching);
 
   var _forecast; // for forecast
   bool forecastError = false;
@@ -237,30 +241,18 @@ class ForecastBodyState extends State<ForecastBody> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Colors.grey[300],
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(0.0), child: Container(),),
-        body: Stack(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.fromLTRB(0, 60, 0, 0),
-              child: isLoading ?
-              Container(alignment: Alignment(0.0,-1.0), padding: EdgeInsets.fromLTRB(0, 55, 0, 0), child: CircularProgressIndicator())
-                  : forecastError?
-              Container(height: 170, padding: EdgeInsets.fromLTRB(20, 10, 20, 0), child: errorCard(context, false))
-                  : Container(alignment: Alignment(0.0, -1.0), child: weatherForecast(firstDayData, secondDayData, thirdDayData, forthDayData, fifthDayData),),
-            ),
-            new Positioned(
-              top: 0.0, left: 0.0, right: 0.0,
-              child: AppBar(
-                title: Text('$city'),
-                backgroundColor: Colors.transparent,
-                elevation: 0.0,
-              ),
-            )
-          ],
-        )
+    return  Container(
+      child: isLoading ?
+      Container(alignment: Alignment(0.0,-1.0), padding: EdgeInsets.fromLTRB(0, 55, 0, 0), child: CircularProgressIndicator())
+          : forecastError?
+      ListView.builder(
+          itemCount: 1,
+          itemBuilder: (context, i){
+            return new ListTile(
+                title: Container(height: 170, padding: EdgeInsets.fromLTRB(20, 10, 20, 0), child: errorCard(context, false))
+            );
+          })
+          : Container(alignment: Alignment(0.0, -1.0), child: weatherForecast(firstDayData, secondDayData, thirdDayData, forthDayData, fifthDayData),),
     );
   }
 
