@@ -315,6 +315,8 @@ class WeatherBodyState extends State<WeatherBody> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.grey[300],
+        appBar: PreferredSize(
+            preferredSize: Size.fromHeight(0.0), child: Container(),),
         body: Stack(
           children: <Widget>[
             Container(

@@ -227,11 +227,12 @@ class ForecastBodyState extends State<ForecastBody> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.grey[300],
-        //appBar:
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(0.0), child: Container(),),
         body: Stack(
           children: <Widget>[
             Container(
-              padding: EdgeInsets.fromLTRB(0, 100, 0, 0),
+              padding: EdgeInsets.fromLTRB(0, 60, 0, 0),
               child: isLoading ?
               Container(alignment: Alignment(0.0,-1.0), padding: EdgeInsets.fromLTRB(0, 55, 0, 0), child: CircularProgressIndicator())
                   : forecastError? Container(height: 170, padding: EdgeInsets.fromLTRB(20, 10, 20, 0), child: errorCard(context, false))

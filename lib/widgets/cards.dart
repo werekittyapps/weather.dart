@@ -97,7 +97,7 @@ currentWeatherSearchCard(BuildContext context, Map<String, dynamic> map, bool is
                                   Container(
                                     alignment: Alignment(1.0, -1.0),
                                     padding: EdgeInsets.fromLTRB(0, 5, 5, 5),
-                                    child: cachedImageLoader(map["weather"][0]["icon"]),
+                                    child: cachedImageLoader(map["weather"][0]["icon"], 60.0),
                                   ),
                                   Container(
                                     alignment: Alignment(1.0, -1.0),
@@ -195,7 +195,7 @@ currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i
                                   Container(
                                     alignment: Alignment(1.0, -1.0),
                                     padding: EdgeInsets.fromLTRB(0, 5, 5, 5),
-                                    child: isItGeoCard ? cachedImageLoader(map["weather"][0]["icon"]) : cachedImageLoader(map["list"][i]["weather"][0]["icon"]),
+                                    child: isItGeoCard ? cachedImageLoader(map["weather"][0]["icon"], 60.0) : cachedImageLoader(map["list"][i]["weather"][0]["icon"], 60.0),
                                   ),
                                   Container(
                                     alignment: Alignment(1.0, -1.0),
@@ -283,7 +283,7 @@ weatherForecast(List<dynamic> first, List<dynamic> second, List<dynamic> third,
         child: Container(
             child: Container (
               // Белая карточка
-                height: 520,
+                height: 480,
                 color: Colors.white,
                 child: Column(
                   children: <Widget>[
@@ -297,9 +297,9 @@ weatherForecast(List<dynamic> first, List<dynamic> second, List<dynamic> third,
                         forecastHighColumn(fifth),
                       ],
                     ),
-                    Container(padding: EdgeInsets.fromLTRB(20, 0, 20, 0), height: 70, width: 360, child: Sparkline(data: dataHigh, lineColor: Colors.grey[400],
+                    Container(padding: EdgeInsets.fromLTRB(20, 0, 20, 0), height: 60, width: 360, child: Sparkline(data: dataHigh, lineColor: Colors.grey[400],
                       lineWidth: 1, pointsMode: PointsMode.all, pointSize: 3, pointColor: Colors.grey[800],)),
-                    Container(padding: EdgeInsets.fromLTRB(20, 0, 20, 0), height: 70, width: 360,child: Sparkline(data: dataLow, lineColor: Colors.grey[400],
+                    Container(padding: EdgeInsets.fromLTRB(20, 0, 20, 0), height: 60, width: 360,child: Sparkline(data: dataLow, lineColor: Colors.grey[400],
                       lineWidth: 1, pointsMode: PointsMode.all, pointSize: 3, pointColor: Colors.grey[800],)),
                     Row (
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -321,7 +321,7 @@ weatherForecast(List<dynamic> first, List<dynamic> second, List<dynamic> third,
 
 forecastHighColumn(List<dynamic> list){
   return Container(
-      height: 200,
+      height: 190,
       width: 80,
       child: Row(
         children: <Widget>[
@@ -343,7 +343,7 @@ forecastHighColumn(List<dynamic> list){
                 Container(
                   child: Column(
                     children: <Widget>[
-                      Container(padding: EdgeInsets.only(bottom: 10), child: cachedImageLoader(list[2].toString()),),
+                      Container(padding: EdgeInsets.only(bottom: 10), child: cachedImageLoader(list[2].toString(), 50.0),),
                       Container(child: greyTextViewForForecast(list[3].toString().toString(), 14)),
                     ],
                   ),
@@ -362,7 +362,7 @@ forecastHighColumn(List<dynamic> list){
 
 forecastLowColumn(List<dynamic> list){
   return Container(
-      height: 180,
+      height: 170,
       width: 80,
       child: Row(
         children: <Widget>[
@@ -378,7 +378,7 @@ forecastLowColumn(List<dynamic> list){
                 Container(
                   child: Column(
                     children: <Widget>[
-                      Container(child: cachedImageLoader(list[6].toString()),),
+                      Container(child: cachedImageLoader(list[6].toString(), 50.0),),
                       Container(padding: EdgeInsets.only(bottom: 10), child: greyTextViewForForecast(list[7].toString(), 14)),
                       Container(child: greyTextViewForForecast("давление", 14)),
                       Container(padding: EdgeInsets.only(bottom: 10), child: greyTextViewForForecast(list[8].toString(), 14)),
