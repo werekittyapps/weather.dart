@@ -46,11 +46,13 @@ class WeatherBodyState extends State<WeatherBody> {
   bool noFavoriteCache = false;
 
   weatherCall(String cities, bool inSearchFlag, double lat, double lon, bool callingGeo) async {
+    if(!callingGeo) print("no geo");
     checkInternet();
     if (isConnected) {
       setState(() {
         isLoading = true;
       });
+      if(!callingGeo) print("no geo");
       try {
         Response response;
         if (callingGeo) {
@@ -154,12 +156,15 @@ class WeatherBodyState extends State<WeatherBody> {
 
   getCachedWeather() async{
     var noData = false;
+    print("cach weat");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var cache = (prefs.getString('favoriteWeatherCache') ?? {
       noFavoriteCache = true,
+      print("no cache"),
       noData = true,
     });
     if(!noData){
+      print("yes cache");
       setState(() {
         noFavoriteCache = false;
         _currentWeatherForFavorites = json.decode(cache);
@@ -172,13 +177,15 @@ class WeatherBodyState extends State<WeatherBody> {
   }
 
   getCached() async{
+    print("get c");
     checkInternet();
-    getLocation();
     getCachedWeather();
+    getLocation();
     var noData = false;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var favorsID = (prefs.getString('favorites') ?? {
       citiesID = null,
+      print("no fav"),
       noFavorites = true,
       noData = true,
     });
@@ -188,6 +195,7 @@ class WeatherBodyState extends State<WeatherBody> {
       citiesID = dealWithCommas(citiesID);
       citiesID = dealWithDuplicated(citiesID);
       prefs.setString('favorites', citiesID);
+      print("get c bef call");
       weatherCall(citiesID, inSearchFlag, 0.0, 0.0, false); //
     }
     setState(() {
@@ -316,11 +324,12 @@ class WeatherBodyState extends State<WeatherBody> {
     }
   }
 
+
   @override
   void initState() {
+    checkInternet();
     getCached();
     //deleteCache();
-
     super.initState();
   }
 
