@@ -65,9 +65,12 @@ class DayForecastState extends State<DayForecast> {
         // 429 - "Исчерпан лимит запросов"
         // 500 - "Internal Server Error: ошибка соединения с сервером"
         // 503 - "Сервер недоступен"
+        print("up here");
         getCachedForecast();
       }
     } catch (e) {
+      print(e);
+      print("down here");
       getCachedForecast();
     }
   }
@@ -100,8 +103,9 @@ class DayForecastState extends State<DayForecast> {
     for (int i = 0; i < 9; i++) {
       var weeky = DateTime.parse(_forecast["list"][i]["dt_txt"]);
       dayList.add("${weeky.hour}:00");
-      tempList.add(_forecast["list"][i]["main"]["temp"]);
+      tempList.add(_forecast["list"][i]["main"]["temp"].toDouble());
     }
+    print("HANDLER2");
     print(dayList);
     print(tempList);
     setState(() {
@@ -129,56 +133,62 @@ class DayForecastState extends State<DayForecast> {
   @override
   Widget build(BuildContext context) {
     return Container(
-            child: isLoading ?
-            Container(alignment: Alignment(0.0,-1.0), padding: EdgeInsets.fromLTRB(0, 55, 0, 0), child: CircularProgressIndicator())
-                : forecastError?
-            Container(height: 170, padding: EdgeInsets.fromLTRB(20, 10, 20, 0), child: errorCard(context, false))
-                : Container(alignment: Alignment(0.0, -1.0), child:
-            SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child:Container (
-      // Белая карточка
-        height: 480,
-        color: Colors.white,
-        child: Column(
-          children: <Widget>[
-            Container(child: Divider(thickness: 1, height: 1, color: Colors.grey[400],)),
-            Row (
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                forecastDayHigh(tempList[0].round().toString()),
-                forecastDayHigh(tempList[1].round().toString()),
-                forecastDayHigh(tempList[2].round().toString()),
-                forecastDayHigh(tempList[3].round().toString()),
-                forecastDayHigh(tempList[4].round().toString()),
-                forecastDayHigh(tempList[5].round().toString()),
-                forecastDayHigh(tempList[6].round().toString()),
-                forecastDayHigh(tempList[7].round().toString()),
-                forecastDayHigh(tempList[8].round().toString()),
-              ],
-            ),
-            Container(padding: EdgeInsets.fromLTRB(20, 20, 20, 20), height: 399, width: 680, child: Sparkline(data: tempList, lineColor: Colors.grey[400],
-              lineWidth: 1, pointsMode: PointsMode.all, pointSize: 3, pointColor: Colors.grey[800],)),
-            Row (
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                forecastDayLow("Сейчас"),
-                forecastDayLow(dayList[1]),
-                forecastDayLow(dayList[2]),
-                forecastDayLow(dayList[3]),
-                forecastDayLow(dayList[4]),
-                forecastDayLow(dayList[5]),
-                forecastDayLow(dayList[6]),
-                forecastDayLow(dayList[7]),
-                forecastDayLow(dayList[8]),
-              ],
-            )
-          ],
-        )
-    )))
-            ),
+      child: isLoading ?
+      Container(alignment: Alignment(0.0,-1.0), padding: EdgeInsets.fromLTRB(0, 55, 0, 0), child: CircularProgressIndicator())
+          : forecastError?
+      ListView.builder(
+          itemCount: 1,
+          itemBuilder: (context, i){
+            return new ListTile(
+                title: Container(height: 170, padding: EdgeInsets.fromLTRB(20, 10, 20, 0), child: errorCard(context, false))
+            );
+          })
+          : Container(alignment: Alignment(0.0, -1.0), child:
+      SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child:Container (
+                // Белая карточка
+                  height: 480,
+                  color: Colors.white,
+                  child: Column(
+                    children: <Widget>[
+                      Container(child: Divider(thickness: 1, height: 1, color: Colors.grey[400],)),
+                      Row (
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          forecastDayHigh(tempList[0].round().toString()),
+                          forecastDayHigh(tempList[1].round().toString()),
+                          forecastDayHigh(tempList[2].round().toString()),
+                          forecastDayHigh(tempList[3].round().toString()),
+                          forecastDayHigh(tempList[4].round().toString()),
+                          forecastDayHigh(tempList[5].round().toString()),
+                          forecastDayHigh(tempList[6].round().toString()),
+                          forecastDayHigh(tempList[7].round().toString()),
+                          forecastDayHigh(tempList[8].round().toString()),
+                        ],
+                      ),
+                      Container(padding: EdgeInsets.fromLTRB(20, 20, 20, 20), height: 399, width: 680, child: Sparkline(data: tempList, lineColor: Colors.grey[400],
+                        lineWidth: 1, pointsMode: PointsMode.all, pointSize: 3, pointColor: Colors.grey[800],)),
+                      Row (
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          forecastDayLow("Сейчас"),
+                          forecastDayLow(dayList[1]),
+                          forecastDayLow(dayList[2]),
+                          forecastDayLow(dayList[3]),
+                          forecastDayLow(dayList[4]),
+                          forecastDayLow(dayList[5]),
+                          forecastDayLow(dayList[6]),
+                          forecastDayLow(dayList[7]),
+                          forecastDayLow(dayList[8]),
+                        ],
+                      )
+                    ],
+                  )
+              )))
+      ),
     );
   }
 }

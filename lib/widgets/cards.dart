@@ -84,7 +84,7 @@ currentWeatherSearchCard(BuildContext context, Map<String, dynamic> map, bool is
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                              Container(width: 160, child: greyAutoSizedTextView(context, map["name"], 22)),
+                              Container(width: 140, child: greyAutoSizedTextView(context, map["name"], 18)),
                                 greyTextView(context, map["sys"]["country"], 12),
                               ],
                             ),
@@ -96,12 +96,12 @@ currentWeatherSearchCard(BuildContext context, Map<String, dynamic> map, bool is
                                 children: <Widget>[
                                   Container(
                                     alignment: Alignment(1.0, -1.0),
-                                    padding: EdgeInsets.fromLTRB(0, 5, 5, 5),
+                                    padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                                     child: cachedImageLoader(map["weather"][0]["icon"], 60.0),
                                   ),
                                   Container(
                                     alignment: Alignment(1.0, -1.0),
-                                    padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                    padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                                     child: greyTextView(context, '${map["main"]["temp"].round()}°C', 24),
                                   ),
                                 ],
@@ -192,8 +192,19 @@ currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                isItGeoCard ? Row(children: <Widget>[Container(width: 160, child: greyAutoSizedTextView(context, map["name"], 22),), Icon(Icons.place, color: Colors.grey[800],)],)
-                                    : Container(width: 160, child: greyAutoSizedTextView(context, map["list"][i]["name"], 22)),
+                                isItGeoCard ?
+                                    Container(
+                                      width: 150,
+                                      child: Row(
+                                        children: <Widget>[
+                                          Flexible(
+                                            child: greyAutoSizedTextView(context, map["name"], 18),
+                                          ),
+                                          Icon(Icons.place, color: Colors.grey[800]),
+                                        ],
+                                      ),
+                                    )
+                                    : Container(width: 140, child: greyAutoSizedTextView(context, map["list"][i]["name"], 18)),
                                 isItGeoCard ? map["sys"] == null ? greyTextView(context, "empty", 12) : greyTextView(context, map["sys"]["country"], 12) : greyTextView(context, map["list"][i]["sys"]["country"], 12),
                               ],
                             ),
@@ -205,12 +216,12 @@ currentWeatherFavoriteCard(BuildContext context, Map<String, dynamic> map, int i
                                 children: <Widget>[
                                   Container(
                                     alignment: Alignment(1.0, -1.0),
-                                    padding: EdgeInsets.fromLTRB(0, 5, 5, 5),
+                                    padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                                     child: isItGeoCard ? cachedImageLoader(map["weather"][0]["icon"], 60.0) : cachedImageLoader(map["list"][i]["weather"][0]["icon"], 60.0),
                                   ),
                                   Container(
                                     alignment: Alignment(1.0, -1.0),
-                                    padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                    padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                                     child: isItGeoCard ? greyTextView(context, '${map["main"]["temp"].round()}°C', 24) : greyTextView(context, '${map["list"][i]["main"]["temp"].round()}°C', 24),
                                   ),
                                 ],
