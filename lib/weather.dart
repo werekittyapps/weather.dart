@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:toast/toast.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
+import 'package:weather/widgets/charts.dart';
 
 class WeatherBody extends StatefulWidget {
 
@@ -177,10 +178,10 @@ class WeatherBodyState extends State<WeatherBody> {
   }
 
   getCached() async{
-    //checkInternet();
+    checkInternet();
+    getLocation();
     getCachedWeather();
     print("get cached");
-    getLocation();
     var noData = false;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var favorsID = (prefs.getString('favorites') ?? {
@@ -329,8 +330,8 @@ class WeatherBodyState extends State<WeatherBody> {
 
   @override
   void initState() {
-    //getCached();
-    deleteCache();
+    getCached();
+    //deleteCache();
 
     super.initState();
   }
@@ -429,7 +430,8 @@ class WeatherBodyState extends State<WeatherBody> {
                       },
                   ),],
               ),
-            )
+            ),
+            //Card(child: Container(height: 300, child: SelectionCallbackExample.withSampleData(35),),)
           ],
         )
     );

@@ -8,6 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'package:weather/widgets/cards.dart';
 import 'package:flutter_sparkline/flutter_sparkline.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
+
 
 class DayForecast extends StatefulWidget {
   final String id;
