@@ -44,6 +44,10 @@ class FiveDaysForecastState extends State<FiveDaysForecast> {
   List<dynamic> forthDayData = [];
   List<dynamic> fifthDayData = [];
 
+  List<int> Lows = [];
+  List<int> Highs = [];
+  List<DateTime> Times = [];
+
   weatherForecastCall(String id) async {
     checkInternet();
     setState(() {
@@ -170,6 +174,24 @@ class FiveDaysForecastState extends State<FiveDaysForecast> {
       forecastHelper(third, thirdList, thirdDayData);
       forecastHelper(forth, forthList, forthDayData);
       forecastHelper(fifth, fifthList, fifthDayData);
+
+      Lows.add(firstDayData[5].round());
+      Lows.add(secondDayData[5].round());
+      Lows.add(thirdDayData[5].round());
+      Lows.add(forthDayData[5].round());
+      Lows.add(fifthDayData[5].round());
+
+      Highs.add(firstDayData[4].round());
+      Highs.add(secondDayData[4].round());
+      Highs.add(thirdDayData[4].round());
+      Highs.add(forthDayData[4].round());
+      Highs.add(fifthDayData[4].round());
+
+      Times.add(first);
+      Times.add(second);
+      Times.add(third);
+      Times.add(forth);
+      Times.add(fifth);
     });
   }
 
@@ -252,7 +274,7 @@ class FiveDaysForecastState extends State<FiveDaysForecast> {
                 title: Container(height: 170, padding: EdgeInsets.fromLTRB(20, 10, 20, 0), child: errorCard(context, false))
             );
           })
-          : Container(alignment: Alignment(0.0, -1.0), child: weatherForecast(firstDayData, secondDayData, thirdDayData, forthDayData, fifthDayData),),
+          : Container(alignment: Alignment(0.0, -1.0), child: weatherForecastNew(firstDayData, secondDayData, thirdDayData, forthDayData, fifthDayData, Lows, Highs, Times),),
     );
   }
 

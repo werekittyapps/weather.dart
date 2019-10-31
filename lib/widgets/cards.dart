@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:weather/utils/utils.dart';
+import 'package:weather/widgets/forecastchart.dart';
 import 'package:weather/widgets/images.dart';
 import 'package:weather/widgets/texts.dart';
 import 'package:flutter_sparkline/flutter_sparkline.dart';
@@ -323,6 +324,49 @@ weatherForecast(List<dynamic> first, List<dynamic> second, List<dynamic> third,
                       lineWidth: 1, pointsMode: PointsMode.all, pointSize: 3, pointColor: Colors.grey[800],)),
                     Container(padding: EdgeInsets.fromLTRB(20, 0, 20, 0), height: 60, width: 360,child: Sparkline(data: dataLow, lineColor: Colors.grey[400],
                       lineWidth: 1, pointsMode: PointsMode.all, pointSize: 3, pointColor: Colors.grey[800],)),
+                    Row (
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        forecastLowColumn(first),
+                        forecastLowColumn(second),
+                        forecastLowColumn(third),
+                        forecastLowColumn(forth),
+                        forecastLowColumn(fifth),
+                      ],
+                    )
+                  ],
+                )
+            )
+        ),
+      )
+  );
+}
+
+weatherForecastNew(List<dynamic> first, List<dynamic> second, List<dynamic> third,
+    List<dynamic> forth, List<dynamic> fifth, List<int> Lows, List<int> Highs, List<DateTime> Times) {
+
+  return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Container(
+            child: Container (
+              // Белая карточка
+                height: 580,
+                color: Colors.white,
+                child: Column(
+                  children: <Widget>[
+                    Row (
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        forecastHighColumn(first),
+                        forecastHighColumn(second),
+                        forecastHighColumn(third),
+                        forecastHighColumn(forth),
+                        forecastHighColumn(fifth),
+                      ],
+                    ),
+                    Container(padding: EdgeInsets.fromLTRB(10, 0, 10, 0), height: 220, width: 400, child: SelectionCallback.withSampleData(Lows, Highs, Times)),
                     Row (
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

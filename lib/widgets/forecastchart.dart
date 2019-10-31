@@ -1,60 +1,63 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 
-class SelectionCallbackExample extends StatefulWidget {
+class SelectionCallback extends StatefulWidget {
   final List<charts.Series> seriesList;
   final bool animate;
 
-  SelectionCallbackExample(this.seriesList, {this.animate});
+  SelectionCallback(this.seriesList, {this.animate});
 
   /// Creates a [charts.TimeSeriesChart] with sample data and no transition.
-  factory SelectionCallbackExample.withSampleData(test) {
-    return new SelectionCallbackExample(
-      _createSampleData(test),
+  factory SelectionCallback.withSampleData(low, high, time) {
+    return new SelectionCallback(
+      _createSampleData(low, high, time),
       // Disable animations for image tests.
-      animate: true,
+      animate: false,
     );
   }
 
+
+  // We need a Stateful widget to build the selection details with the current
+  // selection as the state.
   @override
   State<StatefulWidget> createState() => new _SelectionCallbackState();
 
   /// Create one series with sample hard coded data.
-  static List<charts.Series<TimeSeriesSales, DateTime>> _createSampleData(test) {
+  static List<charts.Series<TimeSeriesSales, DateTime>> _createSampleData(low, high, time) {
     final us_data = [
-      new TimeSeriesSales(DateTime.parse(test["list"][0]["dt_txt"]), test["list"][0]["main"]["temp"].round()),
-      new TimeSeriesSales(DateTime.parse(test["list"][1]["dt_txt"]), test["list"][1]["main"]["temp"].round()),
-      new TimeSeriesSales(DateTime.parse(test["list"][2]["dt_txt"]), test["list"][2]["main"]["temp"].round()),
-      new TimeSeriesSales(DateTime.parse(test["list"][3]["dt_txt"]), test["list"][3]["main"]["temp"].round()),
-      new TimeSeriesSales(DateTime.parse(test["list"][4]["dt_txt"]), test["list"][4]["main"]["temp"].round()),
-      new TimeSeriesSales(DateTime.parse(test["list"][5]["dt_txt"]), test["list"][5]["main"]["temp"].round()),
-      new TimeSeriesSales(DateTime.parse(test["list"][6]["dt_txt"]), test["list"][6]["main"]["temp"].round()),
-      new TimeSeriesSales(DateTime.parse(test["list"][7]["dt_txt"]), test["list"][7]["main"]["temp"].round()),
-      new TimeSeriesSales(DateTime.parse(test["list"][8]["dt_txt"]), test["list"][8]["main"]["temp"].round()),
+      new TimeSeriesSales(time[0], low[0]),
+      new TimeSeriesSales(time[1], low[1]),
+      new TimeSeriesSales(time[2], low[2]),
+      new TimeSeriesSales(time[3], low[3]),
+      new TimeSeriesSales(time[4], low[4]),
+    ];
 
-      //new TimeSeriesSales(new DateTime(2019, 9, 2, 09), test["list"][0]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 2, 12), test["list"][1]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 2, 15), test["list"][2]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 2, 18), test["list"][3]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 2, 21), test["list"][4]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 3, 00), test["list"][5]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 3, 03), test["list"][6]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 3, 06), test["list"][7]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 3, 09), test["list"][8]["main"]["temp"].round()),
+    final uk_data = [
+      new TimeSeriesSales(time[0], high[0]),
+      new TimeSeriesSales(time[1], high[1]),
+      new TimeSeriesSales(time[2], high[2]),
+      new TimeSeriesSales(time[3], high[3]),
+      new TimeSeriesSales(time[4], high[4]),
     ];
 
     return [
       new charts.Series<TimeSeriesSales, DateTime>(
-        id: 'температура (°C)',
+        id: 'температура ночью (°C)',
         domainFn: (TimeSeriesSales sales, _) => sales.time,
         measureFn: (TimeSeriesSales sales, _) => sales.sales,
         data: us_data,
       ),
+      new charts.Series<TimeSeriesSales, DateTime>(
+        id: 'температура днем (°C)',
+        domainFn: (TimeSeriesSales sales, _) => sales.time,
+        measureFn: (TimeSeriesSales sales, _) => sales.sales,
+        data: uk_data,
+      )
     ];
   }
 }
 
-class _SelectionCallbackState extends State<SelectionCallbackExample> {
+class _SelectionCallbackState extends State<SelectionCallback> {
   DateTime _time;
   Map<String, num> _measures;
 
@@ -91,7 +94,7 @@ class _SelectionCallbackState extends State<SelectionCallbackExample> {
     // The children consist of a Chart and Text widgets below to hold the info.
     final children = <Widget>[
       new SizedBox(
-          height: 350.0,
+          height: 150.0,
           child: new charts.TimeSeriesChart(
             widget.seriesList,
             animate: widget.animate,

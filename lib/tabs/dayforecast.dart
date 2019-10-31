@@ -7,8 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'package:weather/widgets/cards.dart';
-import 'package:flutter_sparkline/flutter_sparkline.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:weather/widgets/charts.dart';
 
 
 class DayForecast extends StatefulWidget {
@@ -146,51 +145,53 @@ class DayForecastState extends State<DayForecast> {
             );
           })
           : Container(alignment: Alignment(0.0, -1.0), child:
-      SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child:Container (
-                // Белая карточка
-                  height: 480,
-                  color: Colors.white,
-                  child: Column(
-                    children: <Widget>[
-                      Container(child: Divider(thickness: 1, height: 1, color: Colors.grey[400],)),
-                      Row (
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          forecastDayHigh(tempList[0].round().toString()),
-                          forecastDayHigh(tempList[1].round().toString()),
-                          forecastDayHigh(tempList[2].round().toString()),
-                          forecastDayHigh(tempList[3].round().toString()),
-                          forecastDayHigh(tempList[4].round().toString()),
-                          forecastDayHigh(tempList[5].round().toString()),
-                          forecastDayHigh(tempList[6].round().toString()),
-                          forecastDayHigh(tempList[7].round().toString()),
-                          forecastDayHigh(tempList[8].round().toString()),
-                        ],
-                      ),
-                      Container(padding: EdgeInsets.fromLTRB(20, 20, 20, 20), height: 399, width: 680, child: Sparkline(data: tempList, lineColor: Colors.grey[400],
-                        lineWidth: 1, pointsMode: PointsMode.all, pointSize: 3, pointColor: Colors.grey[800],)),
-                      Row (
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          forecastDayLow("Сейчас"),
-                          forecastDayLow(dayList[1]),
-                          forecastDayLow(dayList[2]),
-                          forecastDayLow(dayList[3]),
-                          forecastDayLow(dayList[4]),
-                          forecastDayLow(dayList[5]),
-                          forecastDayLow(dayList[6]),
-                          forecastDayLow(dayList[7]),
-                          forecastDayLow(dayList[8]),
-                        ],
-                      )
-                    ],
-                  )
-              )))
-      ),
-    );
+      Card(child: Container(height: 400, child: SelectionCallbackExample.withSampleData(_forecast),),)
+      //SingleChildScrollView(
+      //    scrollDirection: Axis.horizontal,
+      //    child: SingleChildScrollView(
+      //        scrollDirection: Axis.vertical,
+      //        child:Container (
+      //          // Белая карточка
+      //            height: 480,
+      //            color: Colors.white,
+      //            child:
+      //            //Column(
+      //            //  children: <Widget>[
+      //            //    Container(child: Divider(thickness: 1, height: 1, color: Colors.grey[400],)),
+      //            //    Row (
+      //            //      mainAxisAlignment: MainAxisAlignment.center,
+      //            //      children: [
+      //            //        forecastDayHigh(tempList[0].round().toString()),
+      //            //        forecastDayHigh(tempList[1].round().toString()),
+      //            //        forecastDayHigh(tempList[2].round().toString()),
+      //            //        forecastDayHigh(tempList[3].round().toString()),
+      //            //        forecastDayHigh(tempList[4].round().toString()),
+      //            //        forecastDayHigh(tempList[5].round().toString()),
+      //            //        forecastDayHigh(tempList[6].round().toString()),
+      //            //        forecastDayHigh(tempList[7].round().toString()),
+      //            //        forecastDayHigh(tempList[8].round().toString()),
+      //            //      ],
+      //            //    ),
+      //            //    Container(padding: EdgeInsets.fromLTRB(20, 20, 20, 20), height: 399, width: 680, child: Sparkline(data: tempList, lineColor: Colors.grey[400],
+      //            //      lineWidth: 1, pointsMode: PointsMode.all, pointSize: 3, pointColor: Colors.grey[800],)),
+      //            //    Row (
+      //            //      mainAxisAlignment: MainAxisAlignment.center,
+      //            //      children: [
+      //            //        forecastDayLow("Сейчас"),
+      //            //        forecastDayLow(dayList[1]),
+      //            //        forecastDayLow(dayList[2]),
+      //            //        forecastDayLow(dayList[3]),
+      //            //        forecastDayLow(dayList[4]),
+      //            //        forecastDayLow(dayList[5]),
+      //            //        forecastDayLow(dayList[6]),
+      //            //        forecastDayLow(dayList[7]),
+      //            //        forecastDayLow(dayList[8]),
+      //            //      ],
+      //            //    )
+      //            //  ],
+      //            //)
+      //        )))
+      //),
+    ));
   }
 }
