@@ -18,7 +18,12 @@ deleteFavoriteWeatherCache(int cityPosition) async{
     var cachedWeather = json.decode(cache);
     cachedWeather["list"][cityPosition] = null;
     cachedWeather["cnt"] = cachedWeather["cnt"] - 1;
-    prefs.setString('favoriteWeatherCache', json.encode(cachedWeather));
+    if(cachedWeather["cnt"]==0) {
+      cachedWeather = null;
+      prefs.setString('favoriteWeatherCache', null);
+    } else {
+      prefs.setString('favoriteWeatherCache', json.encode(cachedWeather));
+    }
   }
 }
 
@@ -35,9 +40,13 @@ deleteFromFavoritesUtils(String id, String citiesID, Function function, int city
     citiesID = citiesID.replaceAll("$id", "");
     if(citiesID == "") citiesID = null;
   }
+  print(citiesID);
   getDataPrefs.setString('favorites', citiesID);
+  print("after");
   deleteForecastFromCacheUtils(id);
+  print("after forecast");
   deleteFavoriteWeatherCache(cityPosition);
+  print("after favorites");
   function();
 }
 
