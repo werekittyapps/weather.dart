@@ -51,23 +51,23 @@ class WeatherBodyState extends State<WeatherBody> {
     });
     try {
       Response response;
-      Response geoResponse;
       if(callingGeo) {
-        geoResponse = await Dio().get("https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid=7fe8b89a7579b408a6997d47eb97164c");
+        response = await Dio().get("https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid=7fe8b89a7579b408a6997d47eb97164c");
       }
       if(inSearchFlag){
         response = await Dio().get("https://api.openweathermap.org/data/2.5/weather?q=$cities&appid=7fe8b89a7579b408a6997d47eb97164c&units=metric");
-      } else {
+      }
+      if(!callingGeo && !inSearchFlag){
         response = await Dio().get("https://api.openweathermap.org/data/2.5/group?id=$cities&units=metric&appid=7fe8b89a7579b408a6997d47eb97164c");
       }
       debugPrint("response ${response.statusCode}");
       if(response.statusCode == 200) {
         if(callingGeo) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
-          var data = geoResponse.data;
+          var data = response.data;
           prefs.setString('geoWeatherCache', json.encode(data));
           setState(() {
-            _currentGeoWeather = geoResponse.data;
+            _currentGeoWeather = response.data;
             curGeoWeatherCallError = false;
             isLoading = false;
           });
@@ -79,7 +79,8 @@ class WeatherBodyState extends State<WeatherBody> {
             searchFlag = true;
             isLoading = false;
           });
-        } else {
+        }
+        if(!callingGeo && !inSearchFlag){
           SharedPreferences prefs = await SharedPreferences.getInstance();
           var data = response.data;
           prefs.setString('favoriteWeatherCache', json.encode(data));
@@ -100,7 +101,8 @@ class WeatherBodyState extends State<WeatherBody> {
         // 503 - "Сервер недоступен"
         setState(() {
           if(callingGeo) {
-            getCachedGeoWeather();
+            //getCachedGeoWeather();
+            curGeoWeatherCallError = true;
           }
           if(inSearchFlag) {
             curWeatherCallError = true;
@@ -115,12 +117,14 @@ class WeatherBodyState extends State<WeatherBody> {
       print(e);
       setState(() {
         if(callingGeo){
-          getCachedGeoWeather();
+          //getCachedGeoWeather();
+          curGeoWeatherCallError = true;
         }
         if(inSearchFlag) {
           curWeatherCallError = true;
           searchFlag = true;
-        } else {
+        }
+        if(!callingGeo && !inSearchFlag){
           getCachedWeather();
         }
         isLoading = false;
@@ -143,24 +147,6 @@ class WeatherBodyState extends State<WeatherBody> {
     }
     setState(() {
       curWeatherCallErrorForFavorites = curWeatherCallErrorForFavorites;
-    });
-  }
-
-  getCachedGeoWeather() async{
-    var noData = false;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var cache = (prefs.getString('geoWeatherCache') ?? {
-      curWeatherCallError = true,
-      print("No cached geo weather"),
-      noData = true,
-    });
-    if(!noData){
-      setState(() {
-        _currentGeoWeather = json.decode(cache);
-      });
-    }
-    setState(() {
-      curWeatherCallError = curWeatherCallError;
     });
   }
 
@@ -232,7 +218,6 @@ class WeatherBodyState extends State<WeatherBody> {
         this._searchIcon = new Icon(Icons.add);
         this._appBarTitle = new Text('Weather');
         editFlag = false;
-        getCached();
       });
     }
   }
@@ -296,7 +281,7 @@ class WeatherBodyState extends State<WeatherBody> {
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
         .then((Position position) {
         _currentPosition = position;
-        weatherCall(citiesID, inSearchFlag, _currentPosition.latitude, _currentPosition.longitude, true);
+        weatherCall(citiesID, false, _currentPosition.latitude, _currentPosition.longitude, true);
     }).catchError((e) {
       print(e);
     });
