@@ -347,47 +347,41 @@ class WeatherBodyState extends State<WeatherBody> {
                               itemCount: 1,
                               itemBuilder: (context, i){
                                 return new ListTile(
-                                  title: Container(child: curWeatherCallError? errorCard(context, curWeatherCallError) : currentWeatherSearchCard(context, _currentWeather, isInFavorites(_currentWeather["id"].toString()), pressButtonSearch),),
+                                  //title: Container(child: curWeatherCallError? errorCard(context, curWeatherCallError) : currentWeatherSearchCard(context, _currentWeather, isInFavorites(_currentWeather["id"].toString()), pressButtonSearch),),
+                                  title: Container(child: curWeatherCallError? errorCard(context, curWeatherCallError) : currentWeatherCard(context, _currentWeather, null, null, null, false, false, true, isInFavorites(_currentWeather["id"].toString()), pressButtonSearch),),
                                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastsBody(id: _currentWeather["id"].toString(), city: _currentWeather["name"].toString(), caching: false,))),
                                 );
                               }),
                         ),
                       ),
                     ]) :
-                // If we not searching, we must show favorite cards
+                // If we not searching, we must show favorite cards currentWeatherCard(BuildContext context, Map<String, dynamic> map, int index, String citiesID, Function function, bool editFlag, bool isItGeoCard, bool searchFlag, bool isInFavorites, Function pressButton)
                 Column (
                     children: [
                       Expanded (
                         child: Container (
                           padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
                           child:
-                          //(_currentWeatherForFavorites == null && _currentGeoWeather == null) || (noFavorites && _currentGeoWeather == null) || (noFavorites && editFlag)?
-                          _currentWeatherForFavorites == null && _currentGeoWeather == null?
+                          ((_currentWeatherForFavorites == null || noFavorites) && _currentGeoWeather == null) || (noFavorites && editFlag) ||
+                              (curGeoWeatherCallError && (noFavoriteCache || curWeatherCallErrorForFavorites || !isConnected))?
                           Container()
-                              :
-                          noFavorites && _currentGeoWeather == null ?
-                          Container() // Если нет избранных карт показываем пустой контейнер
-                              :
-                          noFavorites && editFlag ?
-                          Container() // Если нет избранных карт показываем пустой контейнер
                               :
                           isLoading ?
                           Container(alignment: Alignment(0.0,-1.0), padding: EdgeInsets.fromLTRB(0, 55, 0, 0), child: CircularProgressIndicator(),)
                               :
                           ListView.builder(
-                              //itemCount: noFavorites && _currentGeoWeather != null ? 1 : curGeoWeatherCallError ? _currentWeatherForFavorites["cnt"] : _currentWeatherForFavorites["cnt"] + 1,
                               itemCount: editFlag ? _currentWeatherForFavorites["cnt"]: noFavorites && _currentGeoWeather != null ? 1 : curGeoWeatherCallError || !isConnected ? _currentWeatherForFavorites["cnt"] : _currentWeatherForFavorites["cnt"] + 1,
                               itemBuilder: (context, i){
                                 return new ListTile(
                                   title: Container(
                                       child:
                                       _currentGeoWeather == null ?
-                                      curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag, false, null, null)
-                                          : curGeoWeatherCallError || !isConnected? noFavoriteCache ? Container() : curWeatherCallErrorForFavorites? Container() : currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag, false, null, null)
-                                          : !curGeoWeatherCallError && !isConnected? noFavoriteCache ? Container() : curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag, false, null, null)
-                                          : editFlag? curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag, false, null, null)
-                                          : !curGeoWeatherCallError && i == 0 ? currentWeatherFavoriteCard(context,_currentGeoWeather, 0, citiesID, getCached,  false, true, isInFavorites(_currentGeoWeather["id"].toString()), pressButton)
-                                          : !curGeoWeatherCallError && i != 0 ? curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i - 1, citiesID, getCached,  editFlag, false, null, null)
+                                      curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag, false, false, null, null)
+                                          : curGeoWeatherCallError || !isConnected? currentWeatherCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag, false, false, null, null)
+                                          : !curGeoWeatherCallError && !isConnected? curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag, false, false, null, null)
+                                          : editFlag? curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag, false, false, null, null)
+                                          : !curGeoWeatherCallError && i == 0 ? currentWeatherCard(context,_currentGeoWeather, 0, citiesID, getCached,  false, true, false, isInFavorites(_currentGeoWeather["id"].toString()), pressButton)
+                                          : !curGeoWeatherCallError && i != 0 ? curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherCard(context,_currentWeatherForFavorites, i - 1, citiesID, getCached,  editFlag, false, false, null, null)
                                           : Container()
                                   ),
                                   onTap: () => _currentGeoWeather != null && i == 0 ? Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastsBody(id: _currentGeoWeather["id"].toString(), city: _currentGeoWeather["name"].toString(), caching: false,)))

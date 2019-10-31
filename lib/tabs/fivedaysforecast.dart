@@ -108,7 +108,7 @@ class FiveDaysForecastState extends State<FiveDaysForecast> {
     int beginOfThirdDay;
     int beginOfForthDay;
     int beginOfFifthDay;
-    List list = _forecast["list"];
+    //List list = _forecast["list"];
     List firstList = [];
     List secondList = [];
     List thirdList = [];
@@ -116,8 +116,8 @@ class FiveDaysForecastState extends State<FiveDaysForecast> {
     List fifthList = [];
 
     // разбиваем прогноз по дням
-    for (int i = 0; i < list.length; i++){
-      var weeky = DateTime.parse(list[i]["dt_txt"]);
+    for (int i = 0; i < _forecast["list"].length; i++){
+      var weeky = DateTime.parse(_forecast["list"][i]["dt_txt"]);
       if(i == 0){
         first = weeky;
       }
@@ -149,19 +149,19 @@ class FiveDaysForecastState extends State<FiveDaysForecast> {
 
     // Выделяем листы данных каждому дню
     for(int i = 0; i < beginOfSecondDay; i++){
-      firstList.add(list[i]);
+      firstList.add(_forecast["list"][i]);
     }
     for(int i = beginOfSecondDay; i < beginOfThirdDay; i++){
-      secondList.add(list[i]);
+      secondList.add(_forecast["list"][i]);
     }
     for(int i = beginOfThirdDay; i < beginOfForthDay; i++){
-      thirdList.add(list[i]);
+      thirdList.add(_forecast["list"][i]);
     }
     for(int i = beginOfForthDay; i < beginOfFifthDay; i++){
-      forthList.add(list[i]);
+      forthList.add(_forecast["list"][i]);
     }
     for(int i = beginOfFifthDay; i < beginOfFifthDay + 8; i++){
-      fifthList.add(list[i]);
+      fifthList.add(_forecast["list"][i]);
     }
 
     setState(() {
@@ -270,7 +270,7 @@ class FiveDaysForecastState extends State<FiveDaysForecast> {
                 title: Container(height: 170, padding: EdgeInsets.fromLTRB(20, 10, 20, 0), child: errorCard(context, false))
             );
           })
-          : Container(alignment: Alignment(0.0, -1.0), child: weatherForecastNew(firstDayData, secondDayData, thirdDayData, forthDayData, fifthDayData, Lows, Highs, Times),),
+          : Container(alignment: Alignment(0.0, -1.0), child: weatherForecast(firstDayData, secondDayData, thirdDayData, forthDayData, fifthDayData, Lows, Highs, Times),),
     );
   }
 
