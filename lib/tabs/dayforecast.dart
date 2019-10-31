@@ -66,29 +66,24 @@ class DayForecastState extends State<DayForecast> {
         // 429 - "Исчерпан лимит запросов"
         // 500 - "Internal Server Error: ошибка соединения с сервером"
         // 503 - "Сервер недоступен"
-        print("up here");
         getCachedForecast();
       }
     } catch (e) {
       print(e);
-      print("down here");
       getCachedForecast();
     }
   }
 
   getCachedForecast() async {
-    print("CACHE");
     var noData = false;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var cache = (prefs.getString('forecastFor$id') ?? {
       forecastError = true,
-      print("No cached forecasts"),
       noData = true,
     });
     if (!noData) {
       _forecast = json.decode(cache);
       setState(() {
-        //forecastError = forecastError;
         forecastHandler();
       });
     }
@@ -100,15 +95,11 @@ class DayForecastState extends State<DayForecast> {
 
   forecastHandler() {
     // Выделяем лист данных дню
-    print("HANDLER");
     for (int i = 0; i < 9; i++) {
       var weeky = DateTime.parse(_forecast["list"][i]["dt_txt"]);
       dayList.add("${weeky.hour}:00");
       tempList.add(_forecast["list"][i]["main"]["temp"].toDouble());
     }
-    print("HANDLER2");
-    print(dayList);
-    print(tempList);
     setState(() {
       forecastError = forecastError;
       isLoading = false;
@@ -118,7 +109,6 @@ class DayForecastState extends State<DayForecast> {
   checkInternet() async {
     bool result = await DataConnectionChecker().hasConnection;
     if (result == true) {
-      print('We have connection');
     } else {
       Toast.show("Не удалось подключиться к сети", context,
           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
@@ -146,52 +136,6 @@ class DayForecastState extends State<DayForecast> {
           })
           : Container(alignment: Alignment(0.0, -1.0), child:
       Card(child: Container(height: 400, child: SelectionCallbackExample.withSampleData(_forecast),),)
-      //SingleChildScrollView(
-      //    scrollDirection: Axis.horizontal,
-      //    child: SingleChildScrollView(
-      //        scrollDirection: Axis.vertical,
-      //        child:Container (
-      //          // Белая карточка
-      //            height: 480,
-      //            color: Colors.white,
-      //            child:
-      //            //Column(
-      //            //  children: <Widget>[
-      //            //    Container(child: Divider(thickness: 1, height: 1, color: Colors.grey[400],)),
-      //            //    Row (
-      //            //      mainAxisAlignment: MainAxisAlignment.center,
-      //            //      children: [
-      //            //        forecastDayHigh(tempList[0].round().toString()),
-      //            //        forecastDayHigh(tempList[1].round().toString()),
-      //            //        forecastDayHigh(tempList[2].round().toString()),
-      //            //        forecastDayHigh(tempList[3].round().toString()),
-      //            //        forecastDayHigh(tempList[4].round().toString()),
-      //            //        forecastDayHigh(tempList[5].round().toString()),
-      //            //        forecastDayHigh(tempList[6].round().toString()),
-      //            //        forecastDayHigh(tempList[7].round().toString()),
-      //            //        forecastDayHigh(tempList[8].round().toString()),
-      //            //      ],
-      //            //    ),
-      //            //    Container(padding: EdgeInsets.fromLTRB(20, 20, 20, 20), height: 399, width: 680, child: Sparkline(data: tempList, lineColor: Colors.grey[400],
-      //            //      lineWidth: 1, pointsMode: PointsMode.all, pointSize: 3, pointColor: Colors.grey[800],)),
-      //            //    Row (
-      //            //      mainAxisAlignment: MainAxisAlignment.center,
-      //            //      children: [
-      //            //        forecastDayLow("Сейчас"),
-      //            //        forecastDayLow(dayList[1]),
-      //            //        forecastDayLow(dayList[2]),
-      //            //        forecastDayLow(dayList[3]),
-      //            //        forecastDayLow(dayList[4]),
-      //            //        forecastDayLow(dayList[5]),
-      //            //        forecastDayLow(dayList[6]),
-      //            //        forecastDayLow(dayList[7]),
-      //            //        forecastDayLow(dayList[8]),
-      //            //      ],
-      //            //    )
-      //            //  ],
-      //            //)
-      //        )))
-      //),
     ));
   }
 }

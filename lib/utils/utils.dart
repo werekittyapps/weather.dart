@@ -11,7 +11,6 @@ deleteFavoriteWeatherCache(int cityPosition) async{
   var noData = false;
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var cache = (prefs.getString('favoriteWeatherCache') ?? {
-    print("No cached favorite weather"),
     noData = true,
   });
   if(!noData){
@@ -28,7 +27,6 @@ deleteFavoriteWeatherCache(int cityPosition) async{
 }
 
 deleteFromFavoritesUtils(String id, String citiesID, Function function, int cityPosition) async {
-  print("delete from utils");
   SharedPreferences getDataPrefs = await SharedPreferences.getInstance();
   if (citiesID.contains(",$id")) {
     citiesID = citiesID.replaceAll(",$id", "");
@@ -40,25 +38,19 @@ deleteFromFavoritesUtils(String id, String citiesID, Function function, int city
     citiesID = citiesID.replaceAll("$id", "");
     if(citiesID == "") citiesID = null;
   }
-  print(citiesID);
   getDataPrefs.setString('favorites', citiesID);
-  print("after");
   deleteForecastFromCacheUtils(id);
-  print("after forecast");
   deleteFavoriteWeatherCache(cityPosition);
-  print("after favorites");
   function();
 }
 
 String dealWithDuplicated(String id){
-  print("deal with dublicated");
   var list = [];
   var ids = id;
   if (id != ""){
     list = id.split(",").toList();
     if(list.length != 1 ){
       ids = "";
-      print(ids);
       for(int i = 0; i < list.length - 1; i++) {
         for (int j = i + 1; j < list.length; j++) {
           if (list[i] == list[j]) {
@@ -82,11 +74,9 @@ String dealWithDuplicated(String id){
 }
 
 String dealWithCommas(String id){
-  print("deal with commas");
   var ids = id;
   if (id != ""){
     if(ids[0] == ","){
-      print("so what");
       ids = ids.replaceFirst(",", "");
     }
   }

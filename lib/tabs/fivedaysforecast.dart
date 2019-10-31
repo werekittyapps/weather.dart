@@ -88,13 +88,11 @@ class FiveDaysForecastState extends State<FiveDaysForecast> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var cache = (prefs.getString('forecastFor$id') ?? {
       forecastError = true,
-      print("No cached forecasts"),
       noData = true,
     });
     if(!noData){
       _forecast = json.decode(cache);
       setState(() {
-        //forecastError = forecastError;
         forecastHandler();
       });
     }
@@ -167,7 +165,6 @@ class FiveDaysForecastState extends State<FiveDaysForecast> {
     }
 
     setState(() {
-      print("Bыгружаем листы");
       isLoading = false;
       forecastHelper(first, firstList, firstDayData);
       forecastHelper(second, secondList, secondDayData);
@@ -251,7 +248,6 @@ class FiveDaysForecastState extends State<FiveDaysForecast> {
   checkInternet() async{
     bool result = await DataConnectionChecker().hasConnection;
     if(result == true) {
-      print('We have connection');
     } else {
       Toast.show("Не удалось подключиться к сети", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
     }

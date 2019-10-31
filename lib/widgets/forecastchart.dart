@@ -7,22 +7,17 @@ class SelectionCallback extends StatefulWidget {
 
   SelectionCallback(this.seriesList, {this.animate});
 
-  /// Creates a [charts.TimeSeriesChart] with sample data and no transition.
   factory SelectionCallback.withSampleData(low, high, time) {
     return new SelectionCallback(
       _createSampleData(low, high, time),
-      // Disable animations for image tests.
       animate: false,
     );
   }
 
 
-  // We need a Stateful widget to build the selection details with the current
-  // selection as the state.
   @override
   State<StatefulWidget> createState() => new _SelectionCallbackState();
 
-  /// Create one series with sample hard coded data.
   static List<charts.Series<TimeSeriesSales, DateTime>> _createSampleData(low, high, time) {
     final us_data = [
       new TimeSeriesSales(time[0], low[0]),
@@ -61,20 +56,12 @@ class _SelectionCallbackState extends State<SelectionCallback> {
   DateTime _time;
   Map<String, num> _measures;
 
-  // Listens to the underlying selection changes, and updates the information
-  // relevant to building the primitive legend like information under the
-  // chart.
   _onSelectionChanged(charts.SelectionModel model) {
     final selectedDatum = model.selectedDatum;
 
     DateTime time;
     final measures = <String, num>{};
 
-    // We get the model that updated with a list of [SeriesDatum] which is
-    // simply a pair of series & datum.
-    //
-    // Walk the selection updating the measures map, storing off the sales and
-    // series name for each selection point.
     if (selectedDatum.isNotEmpty) {
       time = selectedDatum.first.datum.time;
       selectedDatum.forEach((charts.SeriesDatum datumPair) {
@@ -91,7 +78,6 @@ class _SelectionCallbackState extends State<SelectionCallback> {
 
   @override
   Widget build(BuildContext context) {
-    // The children consist of a Chart and Text widgets below to hold the info.
     final children = <Widget>[
       new SizedBox(
           height: 150.0,
@@ -107,7 +93,6 @@ class _SelectionCallbackState extends State<SelectionCallback> {
           )),
     ];
 
-    // If there is a selection, then include the details.
     if (_time != null) {
       children.add(new Padding(
           padding: new EdgeInsets.only(top: 5.0),
@@ -121,7 +106,6 @@ class _SelectionCallbackState extends State<SelectionCallback> {
   }
 }
 
-/// Sample time series data type.
 class TimeSeriesSales {
   final DateTime time;
   final int sales;

@@ -109,7 +109,6 @@ class WeatherBodyState extends State<WeatherBody> {
           // 503 - "Сервер недоступен"
           setState(() {
             if (callingGeo) {
-              //getCachedGeoWeather();
               curGeoWeatherCallError = true;
             }
             if (inSearchFlag) {
@@ -125,7 +124,6 @@ class WeatherBodyState extends State<WeatherBody> {
         print(e);
         setState(() {
           if (callingGeo) {
-            //getCachedGeoWeather();
             curGeoWeatherCallError = true;
           }
           if (inSearchFlag) {
@@ -141,7 +139,6 @@ class WeatherBodyState extends State<WeatherBody> {
       }
     } else {
       if (callingGeo) {
-        //getCachedGeoWeather();
         curGeoWeatherCallError = true;
       }
       if (inSearchFlag) {
@@ -160,14 +157,12 @@ class WeatherBodyState extends State<WeatherBody> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var cache = (prefs.getString('favoriteWeatherCache') ?? {
       noFavoriteCache = true,
-      print("No cached favorite weather"),
       noData = true,
     });
     if(!noData){
       setState(() {
         noFavoriteCache = false;
         _currentWeatherForFavorites = json.decode(cache);
-        print(_currentWeatherForFavorites);
       });
     }
     setState(() {
@@ -180,12 +175,10 @@ class WeatherBodyState extends State<WeatherBody> {
     checkInternet();
     getLocation();
     getCachedWeather();
-    print("get cached");
     var noData = false;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var favorsID = (prefs.getString('favorites') ?? {
       citiesID = null,
-      print("No favorites"),
       noFavorites = true,
       noData = true,
     });
@@ -195,10 +188,8 @@ class WeatherBodyState extends State<WeatherBody> {
       citiesID = dealWithCommas(citiesID);
       citiesID = dealWithDuplicated(citiesID);
       prefs.setString('favorites', citiesID);
-      print("citiesID: $citiesID");
       weatherCall(citiesID, inSearchFlag, 0.0, 0.0, false); //
     }
-    print(noData);
     setState(() {
       noFavorites = noFavorites;
     });
@@ -289,7 +280,6 @@ class WeatherBodyState extends State<WeatherBody> {
 
   addToFavorites(String id) async {
     if(citiesID==null) citiesID = "";
-    print("add to favorites");
     SharedPreferences getDataPrefs = await SharedPreferences.getInstance();
     if (citiesID != ""){
       citiesID += ",$id";
@@ -320,7 +310,6 @@ class WeatherBodyState extends State<WeatherBody> {
     bool result = await DataConnectionChecker().hasConnection;
     if(result == true) {
       isConnected = true;
-      print('We have connection');
     } else {
       isConnected = false;
       Toast.show("Не удалось подключиться к сети", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
@@ -372,6 +361,7 @@ class WeatherBodyState extends State<WeatherBody> {
                         child: Container (
                           padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
                           child:
+                          //(_currentWeatherForFavorites == null && _currentGeoWeather == null) || (noFavorites && _currentGeoWeather == null) || (noFavorites && editFlag)?
                           _currentWeatherForFavorites == null && _currentGeoWeather == null?
                           Container()
                               :
@@ -393,8 +383,6 @@ class WeatherBodyState extends State<WeatherBody> {
                                       child:
                                       _currentGeoWeather == null ?
                                       curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag, false, null, null)
-                                          //: curGeoWeatherCallError && i == 0 ? Container()
-                                          //: curGeoWeatherCallError && i != 0 ? curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i - 1, citiesID, getCached,  editFlag, false, null, null)
                                           : curGeoWeatherCallError || !isConnected? noFavoriteCache ? Container() : curWeatherCallErrorForFavorites? Container() : currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag, false, null, null)
                                           : !curGeoWeatherCallError && !isConnected? noFavoriteCache ? Container() : curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag, false, null, null)
                                           : editFlag? curWeatherCallErrorForFavorites? errorCard(context, curWeatherCallError): currentWeatherFavoriteCard(context,_currentWeatherForFavorites, i, citiesID, getCached,  editFlag, false, null, null)

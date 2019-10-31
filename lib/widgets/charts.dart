@@ -31,16 +31,6 @@ class SelectionCallbackExample extends StatefulWidget {
       new TimeSeriesSales(DateTime.parse(test["list"][6]["dt_txt"]), test["list"][6]["main"]["temp"].round()),
       new TimeSeriesSales(DateTime.parse(test["list"][7]["dt_txt"]), test["list"][7]["main"]["temp"].round()),
       new TimeSeriesSales(DateTime.parse(test["list"][8]["dt_txt"]), test["list"][8]["main"]["temp"].round()),
-
-      //new TimeSeriesSales(new DateTime(2019, 9, 2, 09), test["list"][0]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 2, 12), test["list"][1]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 2, 15), test["list"][2]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 2, 18), test["list"][3]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 2, 21), test["list"][4]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 3, 00), test["list"][5]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 3, 03), test["list"][6]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 3, 06), test["list"][7]["main"]["temp"].round()),
-      //new TimeSeriesSales(new DateTime(2019, 9, 3, 09), test["list"][8]["main"]["temp"].round()),
     ];
 
     return [
