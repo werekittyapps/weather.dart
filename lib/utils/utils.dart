@@ -15,31 +15,51 @@ deleteFavoriteWeatherCache(int cityPosition) async{
   });
   if(!noData){
     var cachedWeather = json.decode(cache);
-    cachedWeather["list"][cityPosition] = null;
-    cachedWeather["cnt"] = cachedWeather["cnt"] - 1;
-    if(cachedWeather["cnt"]==0) {
-      cachedWeather = null;
-      prefs.setString('favoriteWeatherCache', null);
+    if (cachedWeather["cnt"] != null){
+      print("up ${cachedWeather["cnt"]}");
+      cachedWeather["cnt"] = cachedWeather["cnt"] - 1;
+      print(cachedWeather["list"][cityPosition]["name"]);
+      print(cachedWeather["cnt"]);
+      cachedWeather["list"].remove(cityPosition);
+      if(cachedWeather["cnt"]==0) {
+        cachedWeather = null;
+        prefs.setString('favoriteWeatherCache', null);
+        print("cnt == 0");
+      } else {
+        prefs.setString('favoriteWeatherCache', json.encode(cachedWeather));
+        print("cnt != 0");
+      }
     } else {
-      prefs.setString('favoriteWeatherCache', json.encode(cachedWeather));
+      prefs.setString('favoriteWeatherCache', null);
     }
   }
 }
 
-addCityToFavorite(List data) async{
+addCityToFavorite(List data, Function function) async{
   var noData = false;
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var cache = (prefs.getString('favoriteWeatherCache') ?? {
     noData = true,
   });
   if(!noData){
+    print("!nodata");
     var cachedWeather = json.decode(cache);
-    cachedWeather["list"].add(data[0]);
-    cachedWeather["cnt"] = cachedWeather["cnt"] + 1;
-    prefs.setString('favoriteWeatherCache', json.encode(cachedWeather));
+    if(cachedWeather["list"] != null){
+      cachedWeather["list"].add(data[0]);
+      cachedWeather["cnt"] = cachedWeather["cnt"] + 1;
+      prefs.setString('favoriteWeatherCache', json.encode(cachedWeather));
+    } else {
+      Map<String,dynamic> map = {"cnt": 0, "list":[]};
+      map["cnt"] = 2;
+      map["list"].add(cachedWeather);
+      map["list"].add(data[0]);
+      prefs.setString('favoriteWeatherCache', json.encode(map));
+    }
   } else {
+    print("nodata");
     prefs.setString('favoriteWeatherCache', json.encode(data[0]));
   }
+  function();
 }
 
 deleteFromFavoritesUtils(String id, String citiesID, Function function, int cityPosition) async {
@@ -62,7 +82,8 @@ deleteFromFavoritesUtils(String id, String citiesID, Function function, int city
 
 deleteFromFavoritesUtilsNew(String id, List data, Function function) async {
   for (int i = 0; i< data.length; i++){
-    if(data[i]["id"] == id) {
+    if(data[i]["id"].toString() == id) {
+      print(data[i]["id"]);
       data.remove(i);
       deleteFavoriteWeatherCache(i);
       deleteForecastFromCacheUtils(id);

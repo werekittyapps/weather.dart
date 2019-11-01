@@ -63,9 +63,11 @@ class WeatherBodyState extends State<WeatherBody> {
             }
             print(outputList);
           } else {
+
             outputList.add(data);
           }
           setState(() {
+            if(url.contains("weather?q")) searchFlag = true;
             errorFlag = false;
             isLoading = false;
           });
@@ -95,7 +97,7 @@ class WeatherBodyState extends State<WeatherBody> {
     bool isIn = false;
     if(_weatherData.isNotEmpty) {
       for(int i = 0; i < _weatherData.length; i++){
-        if (_weatherData[i]["id"] == id){
+        if (_weatherData[i]["id"].toString() == id){
           isIn = true;
         }
       }
@@ -106,7 +108,7 @@ class WeatherBodyState extends State<WeatherBody> {
   pressStarButtonSearch() {
     setState(() {
       if(isInFavorites(_weatherSearchData[0]["id"].toString())) deleteFromFavoritesUtilsNew(_weatherSearchData[0]["id"].toString(), _weatherData, getCached);
-      else addCityToFavorite(_weatherSearchData[0]);
+      else addCityToFavorite(_weatherSearchData, getCached);
       isInFavorites(_weatherSearchData[0]["id"].toString());
     });
   }
@@ -115,10 +117,9 @@ class WeatherBodyState extends State<WeatherBody> {
     setState(() {
       if(isInFavorites(_weatherGeoData[0]["id"].toString())) {
         deleteFromFavoritesUtilsNew(_weatherGeoData[0]["id"].toString(), _weatherData, getCached);
-        getCached();
       } else {
-        addCityToFavorite(_weatherGeoData);
-        getCached();
+        addCityToFavorite(_weatherGeoData, getCached);
+        //getCached();
       }
       isInFavorites(_weatherGeoData[0]["id"].toString());
     });
@@ -134,8 +135,10 @@ class WeatherBodyState extends State<WeatherBody> {
             prefixIcon: new Icon(Icons.search),
             hintText: 'Search...',),
           onSubmitted: (value) {
+            print(value);
             String city = value.trim().replaceAll(" ", "%20").replaceAll("\n", "");
             if(city.isNotEmpty) {
+              _weatherSearchData.clear();
               String url = "https://api.openweathermap.org/data/2.5/weather?q=$city&appid=7fe8b89a7579b408a6997d47eb97164c&units=metric";
               weatherCall(url, _weatherSearchData, searchCallError);
             }
@@ -147,6 +150,7 @@ class WeatherBodyState extends State<WeatherBody> {
           this._appBarTitle = new Text('Weather');
           searchFlag = false;
           _filter.clear();
+          _weatherSearchData.clear();
           getCached();
         }
       }
@@ -173,6 +177,7 @@ class WeatherBodyState extends State<WeatherBody> {
   }
 
   getCachedWeather() async{
+    _weatherData.clear();
     var noData = false;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var cache = (prefs.getString('favoriteWeatherCache') ?? {
@@ -195,7 +200,7 @@ class WeatherBodyState extends State<WeatherBody> {
       if(noData) noFavoriteCache = true;
       else{
         noFavoriteCache = false;
-        _weatherData = _weatherData;
+        //_weatherData = _weatherData;
       }
     });
   }
@@ -256,11 +261,11 @@ class WeatherBodyState extends State<WeatherBody> {
 
   @override
   void initState() {
-    if(checkInternet() != null) getCached();
+    //if(checkInternet() != null) getCached();
     //isConnected = true;
     //getCached();
     //print(isConnected);
-    //deleteCache();
+    deleteCache();
     super.initState();
   }
 
@@ -284,7 +289,7 @@ class WeatherBodyState extends State<WeatherBody> {
                               Container(alignment: Alignment(0.0,-1.0), padding: EdgeInsets.fromLTRB(0, 55, 0, 0), child: CircularProgressIndicator(),)
                                   :
                               ListView.builder(
-                              itemCount: _weatherData.length,
+                              itemCount: 1,
                               itemBuilder: (context, i){
                                 return new ListTile(
                                   title: Container(child: searchCallError? errorCard(context, searchCallError) : weatherCard(context, _weatherSearchData, i, null, false, false, true, isInFavorites(_weatherSearchData[0]["id"].toString()), pressStarButtonSearch),),
@@ -331,17 +336,16 @@ class WeatherBodyState extends State<WeatherBody> {
                                         );
                                       })
                                   :
-                                  _weatherGeoData.isNotEmpty && _weatherData.isNotEmpty ? Container() :
+                                  _weatherGeoData.isEmpty && _weatherData.isEmpty ? Container() :
                               ListView.builder(
-                                  itemCount: _weatherGeoData.isNotEmpty && _weatherData.isNotEmpty? _weatherGeoData.length + _weatherData.length
-                                      : _weatherGeoData.isEmpty && _weatherData.isNotEmpty? _weatherData.length : _weatherGeoData.isNotEmpty && _weatherData.isEmpty? 1 : 0,
+                                  itemCount: _weatherGeoData.isNotEmpty && _weatherData.isNotEmpty? 1 + _weatherData.length : _weatherGeoData.isEmpty && _weatherData.isNotEmpty? _weatherData.length : _weatherGeoData.isNotEmpty && _weatherData.isEmpty? 1 : 0,
                                   itemBuilder: (context, i){
                                     return new ListTile(
                                         title: Container(
                                             child:
                                             geoCallError || _weatherGeoData.isEmpty ? !noFavoriteCache? weatherCard(context, _weatherData, i, getCached, false, false, false, null, null) : Container()
                                             : _weatherGeoData.isNotEmpty && i == 0 ? weatherCard(context, _weatherGeoData, 0, getCached, false, true, false, isInFavorites(_weatherGeoData[0]["id"].toString()), pressStarButton)
-                                            : weatherCard(context, _weatherData, i-1, getCached, false, false, false, null, null)
+                                            : weatherCard(context, _weatherData, i - 1, getCached, false, false, false, null, null)
                                         ),
                                           onTap: () => geoCallError ? Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastsBody(id: _weatherData[i]["id"].toString(), city: _weatherData[i]["name"].toString(), caching: true,)))
                                           : i == 0 ? Navigator.push(context, MaterialPageRoute(builder: (context) => ForecastsBody(id: _weatherGeoData[0]["id"].toString(), city: _weatherGeoData[0]["name"].toString(), caching: false,)))
