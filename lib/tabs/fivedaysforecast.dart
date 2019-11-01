@@ -38,6 +38,14 @@ class FiveDaysForecastState extends State<FiveDaysForecast> {
   DateTime forth;
   DateTime fifth;
 
+  Map<int,dynamic> data = {
+    0:[],
+    1:[],
+    2:[],
+    3:[],
+    4:[],
+  };
+
   List<dynamic> firstDayData = [];
   List<dynamic> secondDayData = [];
   List<dynamic> thirdDayData = [];

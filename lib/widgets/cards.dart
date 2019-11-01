@@ -54,9 +54,20 @@ errorCard(BuildContext context, bool curWeatherCallError) {
 }
 
 currentWeatherCard(BuildContext context, Map<String, dynamic> map, int index, String citiesID, Function function, bool editFlag, bool isItGeoCard, bool searchFlag, bool isInFavorites, Function pressButton) {
-
+var tempList = ["С", "СВ", "В", "ЮВ", "Ю", "ЮЗ", "З", "СЗ"];
   press(String id){
     deleteFromFavoritesUtils(id, citiesID, function, index);
+  }
+
+  getText(double val){
+    if(val > 337.5 ||val < 22.5) return tempList[0];
+    if(val > 22.5 &&val < 67.5 ) return tempList[1];
+    if(val > 67.5 &&val < 112.5) return tempList[2];
+    if(val > 112.5 &&val < 157.5) return tempList[3];
+    if(val > 157.5 &&val < 202.5) return tempList[4];
+    if(val > 202.5 &&val < 247.5) return tempList[5];
+    if(val > 247.5 &&val < 292.5) return tempList[6];
+    return tempList[7];
   }
 
   return Container(
@@ -167,15 +178,7 @@ currentWeatherCard(BuildContext context, Map<String, dynamic> map, int index, St
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             greyTextView(context, 'Влажность ${map["main"]["humidity"].round()}% | '
-                                '${map["wind"]["deg"] == null ? "?"
-                                : map["wind"]["deg"] > 337.5 || map["wind"]["deg"] < 22.5 ? "С"
-                                : map["wind"]["deg"] > 22.5 && map["wind"]["deg"] < 67.5 ? "СВ"
-                                : map["wind"]["deg"] > 67.5 && map["wind"]["deg"] < 112.5 ? "В"
-                                : map["wind"]["deg"] > 112.5 && map["wind"]["deg"] < 157.5 ? "ЮВ"
-                                : map["wind"]["deg"] > 157.5 && map["wind"]["deg"] < 202.5 ? "Ю"
-                                : map["wind"]["deg"] > 202.5 && map["wind"]["deg"] < 247.5 ? "ЮЗ"
-                                : map["wind"]["deg"] > 247.5 && map["wind"]["deg"] < 292.5 ? "З"
-                                : "СЗ"} | ${map["wind"]["speed"].round() * 3.6} км/ч', 14),
+                                '${map["wind"]["deg"] == null ? "?" : getText(map["wind"]["deg"])} | ${map["wind"]["speed"].round() * 3.6} км/ч', 14),
                             greyTextView(context, '${map["main"]["temp_max"].round()}/${map["main"]["temp_min"].round()}°C', 14),
                           ],
                         ) :
@@ -201,6 +204,142 @@ currentWeatherCard(BuildContext context, Map<String, dynamic> map, int index, St
               )
             ],
           )
+      )
+  );
+}
+
+weatherCard(BuildContext context, List data, int index, Function function, bool editFlag, bool geoCard, bool searchCard, bool isInFavorites, Function pressButton) {
+
+  press(String id){
+    deleteFromFavoritesUtilsNew(id, data, function);
+  }
+  var tempList = ["С", "СВ", "В", "ЮВ", "Ю", "ЮЗ", "З", "СЗ"];
+  getWind(int val){
+    if(val > 337.5 ||val < 22.5) return tempList[0];
+    if(val > 22.5 &&val < 67.5 ) return tempList[1];
+    if(val > 67.5 &&val < 112.5) return tempList[2];
+    if(val > 112.5 &&val < 157.5) return tempList[3];
+    if(val > 157.5 &&val < 202.5) return tempList[4];
+    if(val > 202.5 &&val < 247.5) return tempList[5];
+    if(val > 247.5 &&val < 292.5) return tempList[6];
+    return tempList[7];
+  }
+
+  return Container(
+      decoration: BoxDecoration(border: Border.all(color: Colors.grey[400]),),
+      child:
+      Container (
+        // Белая карточка
+          color: Colors.white,
+          child: Row (
+            children: [
+              Expanded(
+                child: Column(
+                  children:[
+                    searchCard?
+                    Container(
+                      alignment: Alignment(-1.0, -1.0),
+                      child: IconButton(
+                        icon: Icon(isInFavorites ? Icons.star : Icons.star_border),
+                        onPressed: (){pressButton();},),
+                    ) :
+                    editFlag ?
+                    Container(
+                      alignment: Alignment(1.0, -1.0),
+                      child: IconButton(
+                        icon: Icon(Icons.remove_circle_outline),
+                        onPressed: (){press(data[index]["id"].toString());},),
+                    ) :
+                    geoCard ?
+                    Container(
+                        alignment: Alignment(-1.0, -1.0),
+                        child: Row(
+                          children: <Widget>[
+                            IconButton(
+                              icon: Icon(isInFavorites ? Icons.star : Icons.star_border),
+                              onPressed: (){pressButton();},),
+                            greyTextView(context, "Текущее местоположение", 14)
+                          ],
+                        )
+                    )
+                        :
+                    SizedBox(height: 48),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Город и страна
+                          // Иконка
+                          // Градусы
+                          Container(
+                            alignment: Alignment(-1.0, -1.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                geoCard ?
+                                Container(
+                                  width: 150,
+                                  child: Row(
+                                    children: <Widget>[
+                                      Flexible(
+                                        child: greyAutoSizedTextView(context, data[index]["name"], 18),
+                                      ),
+                                      Icon(Icons.place, color: Colors.grey[800]),
+                                    ],
+                                  ),
+                                )
+                                    : Container(width: 140, child: greyAutoSizedTextView(context, data[index]["name"], 18)),
+                                geoCard ? data[index]["sys"] == null ? greyTextView(context, "empty", 12) : greyTextView(context, data[index]["sys"]["country"], 12)
+                                    : greyTextView(context, data[index]["sys"]["country"], 12),
+                              ],
+                            ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Container(
+                                    alignment: Alignment(1.0, -1.0),
+                                    padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                    child: cachedImageLoader(data[index]["weather"][0]["icon"], 60.0),
+                                  ),
+                                  Container(
+                                    alignment: Alignment(1.0, -1.0),
+                                    padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                    child: greyTextView(context, '${data[index]["main"]["temp"].round()}°C', 24),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: Divider(
+                        thickness: 1,
+                      ),
+                    ),
+                    Container(
+                        padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
+                        child:
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            greyTextView(context, 'Влажность ${data[index]["main"]["humidity"].round()}% | '
+                                '${data[index]["wind"]["deg"] == null ? "?" : getWind(data[index]["wind"]["deg"].round())} | ${data[index]["wind"]["speed"].round() * 3.6} км/ч', 14),
+                            greyTextView(context, '${data[index]["main"]["temp_max"].round()}/${data[index]["main"]["temp_min"].round()}°C', 14),
+                          ],
+                        )
+                    )
+                  ],
+                )
+              ),
+            ],
+          ),
       )
   );
 }

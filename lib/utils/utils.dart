@@ -26,6 +26,22 @@ deleteFavoriteWeatherCache(int cityPosition) async{
   }
 }
 
+addCityToFavorite(List data) async{
+  var noData = false;
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var cache = (prefs.getString('favoriteWeatherCache') ?? {
+    noData = true,
+  });
+  if(!noData){
+    var cachedWeather = json.decode(cache);
+    cachedWeather["list"].add(data[0]);
+    cachedWeather["cnt"] = cachedWeather["cnt"] + 1;
+    prefs.setString('favoriteWeatherCache', json.encode(cachedWeather));
+  } else {
+    prefs.setString('favoriteWeatherCache', json.encode(data[0]));
+  }
+}
+
 deleteFromFavoritesUtils(String id, String citiesID, Function function, int cityPosition) async {
   SharedPreferences getDataPrefs = await SharedPreferences.getInstance();
   if (citiesID.contains(",$id")) {
@@ -41,6 +57,17 @@ deleteFromFavoritesUtils(String id, String citiesID, Function function, int city
   getDataPrefs.setString('favorites', citiesID);
   deleteForecastFromCacheUtils(id);
   deleteFavoriteWeatherCache(cityPosition);
+  function();
+}
+
+deleteFromFavoritesUtilsNew(String id, List data, Function function) async {
+  for (int i = 0; i< data.length; i++){
+    if(data[i]["id"] == id) {
+      data.remove(i);
+      deleteFavoriteWeatherCache(i);
+      deleteForecastFromCacheUtils(id);
+    }
+  }
   function();
 }
 
