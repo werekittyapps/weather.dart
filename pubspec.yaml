@@ -19,8 +19,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  dio: 3.0.3
-  cached_network_image: ^1.1.2+1
+  dio: ">=3.0.3 <6.0.0"
+  cached_network_image: ">=1.1.2+1 <4.0.0"
   shared_preferences: ^0.5.4
   geolocator: ^5.1.4+2
   flutter_sparkline: ^0.1.0
